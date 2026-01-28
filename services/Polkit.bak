@@ -1,0 +1,187 @@
+/*
+Singleton {
+    id: root
+
+
+    // Expose the agent and current flow
+    readonly property PolkitAgent agent: agent
+    readonly property AuthFlow flow: agent.flow
+
+    // Agent state
+    readonly property bool isActive: agent.isActive
+    readonly property bool isRegistered: agent.isRegistered
+    
+    // Flow state - safe access with null checks
+    readonly property bool hasActiveRequest: flow !== null
+    readonly property bool isCompleted: flow?.isCompleted ?? false
+    readonly property bool isCancelled: flow?.isCancelled ?? false
+    readonly property bool isSuccessful: flow?.isSuccessful ?? false
+    readonly property bool hasFailed: flow?.failed ?? false
+    readonly property bool isResponseRequired: flow?.isResponseRequired ?? false
+    readonly property bool responseVisible: flow?.responseVisible ?? false
+    
+    // Authentication details
+    readonly property string message: flow?.message ?? ""
+    readonly property string supplementaryMessage: flow?.supplementaryMessage ?? ""
+    readonly property bool supplementaryIsError: flow?.supplementaryIsError ?? false
+    readonly property string inputPrompt: flow?.inputPrompt ?? ""
+    readonly property string iconName: flow?.iconName ?? ""
+    readonly property string actionId: flow?.actionId ?? ""
+    readonly property string cookie: flow?.cookie ?? ""
+    
+    // Identity management
+    readonly property var identities: flow?.identities ?? []
+    property var selectedIdentity: flow?.selectedIdentity
+    
+    // Signals for authentication lifecycle
+    signal authenticationRequestStarted()
+    signal authenticationSucceeded()
+    signal authenticationFailed()
+    signal authenticationRequestCancelled()
+    signal authenticationCompleted()
+    
+    // Signals for user interaction
+    signal responseRequired()
+    signal supplementaryMessageChanged()
+
+    // The Polkit agent - handles communication with daemon
+    PolkitAgent {
+        id: agent
+
+        // Emitted when a new authentication request starts
+        onAuthenticationRequestStarted: {
+          root.authenticationRequestStarted()
+          console.log("Auth started")
+        }
+    }
+
+    // Monitor the authentication flow
+    Connections {
+        target: flow
+        
+        // Authentication succeeded
+        function onAuthenticationSucceeded() {
+            root.authenticationSucceeded()
+            root.authenticationCompleted()
+        }
+
+        // Authentication failed - a new session is automatically created for retry
+        function onAuthenticationFailed() {
+            root.authenticationFailed()
+        }
+
+        // Request was cancelled by the daemon (not the user)
+        function onAuthenticationRequestCancelled() {
+            root.authenticationRequestCancelled()
+            root.authenticationCompleted()
+        }
+
+        // User input is required (e.g., password prompt)
+        function onIsResponseRequiredChanged() {
+            if (flow && flow.isResponseRequired) {
+                root.responseRequired()
+            }
+        }
+
+        // Additional messages for the user (errors, instructions, etc.)
+        function onSupplementaryMessageChanged() {
+            if (flow && flow.supplementaryMessage) {
+                root.supplementaryMessageChanged()
+            }
+        }
+    }
+
+    // Submit user's response (typically a password)
+    function submit(value) {
+        if (!flow) {
+            console.warn("PolkitService: Cannot submit - no active authentication flow")
+            return false
+        }
+        
+        if (!flow.isResponseRequired) {
+            console.warn("PolkitService: Cannot submit - no response required")
+            return false
+        }
+        
+        flow.submit(value)
+        return true
+    }
+
+    // Cancel the authentication request from user side
+    function cancel() {
+        if (!flow) {
+            console.warn("PolkitService: Cannot cancel - no active authentication flow")
+            return false
+        }
+        
+        flow.cancelAuthenticationRequest()
+        return true
+    }
+
+    // Select a different identity to authenticate with
+    // This aborts any ongoing conversation and starts a new one
+    function selectIdentity(identity) {
+        if (!flow) {
+            console.warn("PolkitService: Cannot select identity - no active flow")
+            return false
+        }
+        
+        flow.selectedIdentity = identity
+        return true
+    }
+
+    // Helper to resolve icon name to file path
+    function getIconPath(fallback) {
+        if (iconName) {
+            return Quickshell.iconPath(iconName) || fallback || ""
+        }
+        return fallback || ""
+    }
+
+    // Format identity for display
+    function formatIdentity(identity) {
+        if (!identity) return ""
+        
+        // Identity object typically has name and isUser properties
+        if (identity.name) {
+            return identity.isUser ? 
+                qsTr("User: %1").arg(identity.name) : 
+                qsTr("Group: %1").arg(identity.name)
+        }
+        
+        return identity.toString()
+    }
+
+    // Get list of formatted identities
+    function getFormattedIdentities() {
+        return identities.map(formatIdentity)
+    }
+
+    // Get current state as descriptive string
+    function getStateDescription() {
+        if (!hasActiveRequest) 
+            return "No active authentication request"
+        if (!flow.isCompleted) {
+            if (flow.isResponseRequired)
+                return "Waiting for user input"
+            return "Authentication in progress"
+        }
+        if (flow.isSuccessful)
+            return "Authentication successful"
+        if (flow.isCancelled)
+            return "Authentication cancelled"
+        return "Authentication completed"
+    }
+
+    // Check if we should show the authentication dialog
+    readonly property bool shouldShowDialog: hasActiveRequest && !isCompleted
+
+    Component.onCompleted: {
+        if (isRegistered) {
+            console.log("PolkitService: Agent registered at", agentPath)
+        } else {
+            console.error("PolkitService: Failed to register agent at", agentPath)
+        }
+    }
+  }
+*/
