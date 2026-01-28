@@ -51,6 +51,12 @@ Rectangle {
       Layout.fillWidth: true
       Layout.fillHeight: true
       radius: 20
+
+      Loader {
+        anchors.fill: parent
+
+        source: root.show === "weather" ? "/home/mikaelio/ravenshell/modules/ControlCenter/cards/WeatherCard.qml" : "WeatherCard.aml"
+      }
     }
   }
 }

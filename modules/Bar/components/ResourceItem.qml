@@ -9,7 +9,7 @@ Item {
     id: root
     implicitWidth: contentColumn.implicitWidth * 1.4
     implicitHeight: contentColumn.implicitHeight * 1.2
-    ColumnLayout {
+    RowLayout {
         id: contentColumn
         anchors.centerIn: parent
         spacing: 8

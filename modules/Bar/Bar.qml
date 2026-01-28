@@ -21,12 +21,12 @@ Variants {
             screen: loader.modelData
             anchors {
                 top: true
-                bottom: true
+                right: true
                 left: true
             }
             margins {
-                top: 10
-                bottom: 10
+                top: 5
+                bottom: 5
                 left: 5
             }
 
@@ -34,17 +34,15 @@ Variants {
             exclusiveZone: 1
             color: "transparent"
 
-            readonly property int panelWidth: 35
-            implicitWidth: panelWidth + Ui.tokens.spacing.sm * 2
+            readonly property int panelWidth: 25
+            implicitHeight: panelWidth + Ui.tokens.spacing.sm * 2
 
             Rectangle {
                 anchors.fill: parent
                 color: Qt.rgba(ColorService.colorPalette.backgroundSecondary.r, ColorService.colorPalette.backgroundSecondary.g, ColorService.colorPalette.backgroundSecondary.b, 1)
                 radius: 18
-                ColumnLayout {
+                RowLayout {
                     anchors.fill: parent
-                    anchors.topMargin: 10
-                    anchors.bottomMargin: 10
                     spacing: 8
 
                     ButtonIcon {
@@ -71,10 +69,12 @@ Variants {
                         Layout.fillHeight: true
                     }
                     BatteryIndicator {
-                        Layout.alignment: Qt.AlignHCenter
+                      Layout.alignment: Qt.AlignHCenter
+                      rotation: -90
                     }
                     TimeItem {
-                        Layout.alignment: Qt.AlignHCenter
+                      Layout.alignment: Qt.AlignHCenter
+                      rotation: -90
                     }
 
                     ButtonIcon {

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import QtQuick.Controls
 import Quickshell
 import Quickshell.Widgets
 import qs.assets
@@ -79,6 +80,42 @@ Item {
                         buttonPadding: Ui.tokens.spacing.md
                         backgroundColor: ColorService.colorPalette.accentonPrimary
                       }
+                    }
+
+                  Rectangle {
+                  anchors {
+                    bottom: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                    bottomMargin: Ui.tokens.spacing.md * 2
+                  }
+                  color: ColorService.colorPalette.accentonPrimary
+                  implicitWidth: 500
+                  implicitHeight: 120
+                  radius: 40
+
+                  RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 20
+                    ClippingRectangle {
+                      implicitWidth:  80
+                      implicitHeight: 80
+                      radius: 50
+
+                      Image {
+                        anchors.fill: parent
+                        source:"///home/mikaelio/.face.icon"
+                      }
+                    }
+                    TextField {
+                      Layout.fillWidth: true
+                      Layout.preferredHeight: 50
+                      background: Rectangle {
+                        color: ColorService.colorPalette.accentonPrimary_700
+                        radius: 18
+                      }
+                    }
+                  }
                 }
             }
         }

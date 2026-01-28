@@ -9,8 +9,8 @@ import qs.widgets
 
 Rectangle {
     id: root
-    implicitWidth: 40
-    implicitHeight: 180
+    implicitWidth: 180
+    implicitHeight: 40
     color: ColorService.colorPalette.backgroundSecondary_300
     radius: 18
 
@@ -33,13 +33,13 @@ Rectangle {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: parent.verticalCenter
         }
-        width: 28
-        height: Math.min(contentHeight, parent.height - 16)
+        height: 28
+        width: Math.min(contentHeight, parent.height - 16)
         spacing: 4
         interactive: false
         model: HyprlandService.visibleWorkspaces
         clip: true
-
+        orientation: ListView.Horizontal
         delegate: Rectangle {
             id: workspaceRect
             required property var modelData

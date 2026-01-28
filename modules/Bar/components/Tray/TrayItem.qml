@@ -11,7 +11,7 @@ Item {
 
     implicitWidth: trayColumn.implicitWidth * 1.4
     implicitHeight: trayColumn.implicitHeight * 1.2
-    ColumnLayout {
+    RowLayout {
         id: trayColumn
         anchors.centerIn: parent
         spacing: Ui.tokens.spacing.sm
