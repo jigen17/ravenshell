@@ -253,7 +253,7 @@ QtObject {
     // ============================================
     readonly property QtObject
     battery: QtObject {
-        readonly property string lightning: "\u{e2de}"
+        readonly property string lighting: "\u{e2de}"
         readonly property string plug: ""
         readonly property string full: ""
         readonly property string high: ""
@@ -367,4 +367,15 @@ QtObject {
         readonly property string question: "\u{e3e8}"
     }
 
-}
+    //=============================================
+    // WEATHER
+    // ============================================
+    
+  readonly property QtObject
+     weather: QtObject {
+      readonly property string drop: "\u{e210}"
+      readonly property string umbrella: "\u{e684}"
+      readonly property string wind: "\u{e5d2}"
+
+    }
+ }

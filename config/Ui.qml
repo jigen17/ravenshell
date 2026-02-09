@@ -32,7 +32,7 @@ Singleton {
 
             // Standard desktop icon sizes: 16, 24, 32, 48, 64
             property JsonObject iconSize: JsonObject {
-                property real xs: 16 * root.scale  // Small toolbar icons
+                property real xs: 14 * root.scale  // Small toolbar icons
                 property real sm: 22 * root.scale  // Standard toolbar/menu icons
                 property real md: 24 * root.scale  // Medium buttons
                 property real lg: 48 * root.scale  // Large icons/app lists

@@ -6,9 +6,12 @@ import qs.widgets
 
 Text {
   id: root
-  property color textColor: ColorService.colorPalette.textPrimary
+  property color textColor: ColorService.colorPalette.textSecondary
   property  double fontSize: Ui.tokens.fontSize.sm
   color: root.textColor
   font.pixelSize: root.fontSize
   font.family: Settings.config.fonts.primary
+  renderType: Text.HighRenderTypeQuality
+  antialiasing: true
+  smooth: true
 }

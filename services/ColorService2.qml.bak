@@ -1,0 +1,38 @@
+pragma Singleton
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import qs.config
+
+Singleton {
+    id: root
+    
+    // Named color properties with fallbacks
+    property color color1: colors.length > 0 ? colors[0] : "#1a1a1a"
+    property color color2: colors.length > 1 ? colors[1] : "#2a2a2a"
+    property color color3: colors.length > 2 ? colors[2] : "#3a3a3a"
+    property color color4: colors.length > 3 ? colors[3] : "#4a4a4a"
+    property color color5: colors.length > 4 ? colors[4] : "#5a5a5a"
+    property color color6: colors.length > 5 ? colors[5] : "#6a6a6a"
+    property color color7: colors.length > 6 ? colors[6] : "#7a7a7a"
+    property color color8: colors.length > 7 ? colors[7] : "#8a8a8a"
+    
+    // Direct access to all colors if needed
+    property alias colors: colorQuant.colors
+    property bool ready: colors.length > 0
+    
+     /*ColorQuantizer {
+        id: colorQuant
+        rescaleSize: 128
+        depth: 4  // 2³ = 8 colors
+        source: Qt.resolvedUrl(Settings.config.wallpapers.path)
+        
+        onColorsChanged: {
+          console.log("Wallpaper colors updated:", colors.length, "colors")
+          for ( var i = 0 ; i < colorQuant.colors.length ; i++) {
+            console.log(`color ${i}:`,colorQuant.colors[i]);
+          }
+        }
+      }
+      */
+}

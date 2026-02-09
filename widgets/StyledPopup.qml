@@ -12,7 +12,7 @@ Item {
     // Content to display in the popup
     property Component contentItem: Item {}
 
-    property int animationType: 4 //Settings.config.panels.popupAnimations
+    property int animationType: 1 //Settings.config.panels.popupAnimations
     property int animationDuration: 250
     property int animationEasing: Easing.OutCubic
 
@@ -59,7 +59,8 @@ Item {
             visible: true
             color: "transparent"
             anchor.item: root.anchorItem
-            anchor.rect.x: root.anchorItem ? root.anchorItem.width * 1.5 : 0
+            anchor.rect.x: root.anchorItem ? - (root.anchorItem.width  / 2)   : 0
+            anchor.rect.y: root.anchorItem ? root.anchorItem.height * 1.5 : 0
             
             // Size based on container
             implicitWidth: container.width
@@ -81,8 +82,8 @@ Item {
                 implicitWidth: contentLoader.item ? contentLoader.item.implicitWidth + root.margins * 2 : 100
                 implicitHeight: contentLoader.item ? contentLoader.item.implicitHeight + root.margins * 2 : 100
                 
-                color: ColorService.colorPalette.backgroundSecondary
-                radius: 15
+                color: ColorService.colorPalette.backgroundPrimary
+                radius: Ui.tokens.radius.lg
                 state: "closed"
                 focus:true
                 Keys.onEscapePressed: root.closeWindow();

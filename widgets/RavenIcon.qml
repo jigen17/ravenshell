@@ -6,7 +6,7 @@ import qs.services
 
 Text {
     id: root
-    property color iconColor: ColorService.colorPalette.textSecondary
+    property color iconColor: ColorService.colorPalette.textPrimary
     property  int iconSize: Ui.tokens.iconSize.sm
     property alias iconName: root.text
     color: root.iconColor

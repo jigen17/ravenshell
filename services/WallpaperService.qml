@@ -18,6 +18,8 @@ Singleton {
     // Expose the folder model as an alias
     property alias wallpapers: folderModel
     
+    // Expose the quantized colors
+    
     // Dynamically populates from the wallpaper directory
     FolderListModel {
         id: folderModel
@@ -66,7 +68,26 @@ Singleton {
         Settings.config.wallpapers.path = path;
         // Trigger wallpaper service (e.g., wallust, pywal, etc.)
         WallustService.startWallustService();
-      }
-  }
-    
-
+    }
+    /*
+    ColorQuantizer {
+        id: colorQuantizer
+        rescaleSize: 64  // Rescale for faster processing (recommended)
+        depth: 3  // Will produce 8 colors (2³)
+        source: root.currentWallpaper ? Qt.resolvedUrl(root.currentWallpaper) : ""
+        
+        onSourceChanged: {
+            console.log("ColorQuantizer source changed to:", source);
+        }
+        
+        onColorsChanged: {
+            // Colors is a readonly list<color>, so we iterate differently
+            console.log("ColorQuantizer extracted", colors.length, "colors from wallpaper");
+            
+            // Log each color
+            for (var i = 0; i < colors.length; i++) {
+                console.log("  Color " + i + ":", colors[i]);
+            }
+        }
+    }*/
+}

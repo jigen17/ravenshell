@@ -6,7 +6,7 @@ import Quickshell.Hyprland
 Singleton {
     id: root
     
-    readonly property int visibleCount: 5
+    readonly property int visibleCount: 9
     readonly property int activeWsId: Hyprland.focusedWorkspace?.id ?? 1
     property var visibleWorkspaces: []
     
@@ -31,9 +31,7 @@ Singleton {
                 const layoutData = event.parse(2);
                 root.currentKeyboard = layoutData[0];
                 root.currentLayout = layoutData[1];
-                
                 console.log("Layout changed: ", root.currentLayout);
-                
             }
         }
     }
@@ -65,49 +63,64 @@ Singleton {
     }
     
     function rebuild() {
-        // Calculate sliding window: always show 5 consecutive workspaces
-        // Position active workspace with 2 above, 2 below (when possible)
-        const focused = activeWsId;
-        
-        // Calculate start position
-        // If focused <= 2, start at 1 (shows ws 1-5)
-        // Otherwise, center focused with 2 above (shows focused-2 to focused+2)
-        const startId = Math.max(1, focused - 2);
         const result = [];
         
-        // Generate 5 consecutive workspaces
-        for (let i = 0; i < visibleCount; i++) {
-            const wsId = startId + i;
+        // Generate fixed workspaces 1-9
+        for (let i = 1; i <= visibleCount; i++) {
+            const appInfo = getPrimaryAppForWorkspace(i);
+            const isOccupied = appInfo.app !== "";
+            const isFocused = (i === activeWsId);
+            
             result.push({
-                id: wsId,
-                workspaceId: wsId,  // Keep both for compatibility
-                apps: collectAppsForWorkspace(wsId),
-                isOccupied: isWorkspaceOccupied(wsId)
+                id: i,
+                workspaceId: i,
+                app: appInfo.app,           // Single app string
+                isUrgent: appInfo.isUrgent, // Whether this app is urgent
+                isOccupied: isOccupied,
+                isFocused: isFocused,
+                state: isFocused ? "focused" : (isOccupied ? "occupied" : "unoccupied")
             });
         }
         
         visibleWorkspaces = result;
     }
     
-    function isWorkspaceOccupied(wsId) {
-        for (const ws of Hyprland.workspaces.values) {
-            if (ws.id === wsId) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    function collectAppsForWorkspace(wsId) {
-        const set = new Set();
+    function getPrimaryAppForWorkspace(wsId) {
+        let urgentApp = "";
+        let focusedApp = "";
+        let firstApp = "";
+        
         for (const tl of Hyprland.toplevels.values) {
             if (tl.workspace?.id === wsId) {
-                const appId = tl.wayland.appId || tl.wayland.class;
+                const appId = tl.wayland.appId || tl.wayland.title;
                 if (appId) {
-                    set.add(appId.toLowerCase());
+                    const normalizedAppId = appId;
+                    
+                    // Priority 1: Urgent windows (highest priority)
+                    if (tl.urgent && !urgentApp) {
+                        urgentApp = normalizedAppId;
+                        // Don't break - keep looking in case there's a focused urgent window
+                    }
+                    
+                    // Priority 2: Focused window
+                    if (tl === Hyprland.focusedToplevel) {
+                        focusedApp = normalizedAppId;
+                    }
+                    
+                    // Priority 3: First app found (fallback)
+                    if (!firstApp) {
+                        firstApp = normalizedAppId;
+                    }
                 }
             }
         }
-        return Array.from(set);
+        
+        // Return the highest priority app found
+        const selectedApp = urgentApp || focusedApp || firstApp;
+        
+        return {
+            app: selectedApp,
+            isUrgent: urgentApp !== "" && selectedApp === urgentApp
+        };
     }
 }

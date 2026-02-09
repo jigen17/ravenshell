@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import Quickshell.Widgets
 import qs.services
 import qs.config
 
@@ -110,8 +111,8 @@ Item {
                 
                 // Children follow parent
                 anchors.fill: parent
-                
-                color: ColorService.colorPalette.backgroundSecondary
+                clip: true
+                color: ColorService.colorPalette.backgroundPrimary
                 radius: root.cornerRadius
                 state: "closed"
                 
