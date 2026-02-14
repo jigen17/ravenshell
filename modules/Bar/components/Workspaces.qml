@@ -6,17 +6,24 @@ import Quickshell.Widgets
 import qs.services
 import qs.widgets
 
-Rectangle {
+Item {
     id: root
-    implicitWidth: 270
-    implicitHeight: 35
-    color: ColorService.colorPalette.accentSecondary
-    radius: 20
-    property int widgetPadding: 8
-    property int workspaceButtonSize: 28
-    property int animDuration: 300
+    implicitHeight: 28
     
-    // Subtle glow effect for active workspace
+    property int widgetPadding: 8
+    property int workspaceButtonSize: 24
+    property int animDuration: 200
+    
+    // LAYER 1: Static background (cached separately)
+    Rectangle {
+        id: background
+        anchors.fill: parent
+        color: ColorService.colorPalette.backgroundSecondary
+        radius: 20
+        layer.enabled: true  // Cache just the background
+        z: 0
+    }
+    
     WheelHandler {
         target: root
         cursorShape: Qt.PointingHandCursor
@@ -29,278 +36,332 @@ Rectangle {
         }
     }
     
-    // Active workspace pill background with glow
-    Rectangle {
-        id: activeHighlight
-        z: 0
+    // LAYER 2: Content container
+    Item {
+        id: contentContainer
+        anchors.centerIn: parent
+        implicitWidth: rowLayout.implicitWidth
+        implicitHeight: parent.height
         
-        property int activeIndex: getActiveWorkspaceIndex()
-        property real targetX: activeIndex * workspaceButtonSize + widgetPadding
-        
-        x: targetX
-        implicitWidth: workspaceButtonSize
-        implicitHeight: workspaceButtonSize
-        anchors.verticalCenter: parent.verticalCenter
-        
-        radius: implicitWidth / 2        
-        color: ColorService.colorPalette.accentPrimary_300
-        
-        
-        Behavior on x {
-            NumberAnimation {
-                duration: animDuration
-                easing.type: Easing.OutCubic
-            }
-        }
-        
-        Behavior on implicitWidth {
-            NumberAnimation {
-                duration: animDuration
-                easing.type: Easing.OutCubic
-            }
-        }
-    }
-    
-    // Workspace buttons
-    ListView {
-        id: workspaceList
-        anchors.fill: parent
-        anchors.margins: widgetPadding
-        
-        orientation: ListView.Horizontal
-        spacing: 0
-        interactive: false
-        
-        model: HyprlandService.visibleWorkspaces
-        
-        delegate: Item {
-            id: workspaceButton
-            required property var modelData
-            required property int index
-            anchors.verticalCenter: parent.verticalCenter
+        // Active workspace pill - positioned relative to rowLayout
+        Rectangle {
+            id: activeHighlight
+            z: 1
+            
+            property int activeIndex: getActiveWorkspaceIndex()
+            
+            // Position at start of first button
+            x: 0
             implicitWidth: workspaceButtonSize
             implicitHeight: workspaceButtonSize
-            z: 2
+            anchors.verticalCenter: parent.verticalCenter
             
-            property bool isActive: modelData.state === "focused"
-            property bool isOccupied: modelData.isOccupied
-            property bool isUrgent: modelData.isUrgent || false
+            radius: implicitWidth / 2        
+            color: ColorService.colorPalette.accentonSecondary
             
-            // Hover and press animations
-            property real hoverScale: 1.0
-            scale: hoverScale
-            transformOrigin: Item.Center
+            // GPU-accelerated transform (centered on buttons!)
+            transform: Translate {
+                x: activeHighlight.activeIndex * root.workspaceButtonSize
+                
+                Behavior on x {
+                    NumberAnimation {
+                        duration: root.animDuration
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
             
-            Behavior on scale {
-                NumberAnimation { 
-                    duration: 200
+            Behavior on implicitWidth {
+                NumberAnimation {
+                    duration: root.animDuration
                     easing.type: Easing.OutCubic
                 }
             }
-            
-            // Content container
-            Item {
-                anchors.centerIn: parent
-                implicitWidth: workspaceButtonSize
-                implicitHeight: workspaceButtonSize
+        }
+        
+        // Workspace buttons
+        RowLayout {
+            id: rowLayout
+            anchors.centerIn: parent
+            spacing: 0
+            z: 2
+
+            Component.onCompleted: root.implicitWidth = implicitWidth + 20
+            Repeater {
+                model: HyprlandService.visibleWorkspaces
                 
-                // Urgent indicator pulse (enhanced)
-                Rectangle {
-                    id: urgentPulse
-                    anchors.centerIn: parent
-                    implicitWidth: parent.implicitWidth
-                    implicitHeight: parent.implicitHeight
-                    radius: implicitWidth / 2
-                    color: "transparent"
-                    border.width: 2.5
-                    border.color: "#ff5555"
-                    visible: workspaceButton.isUrgent
-                    opacity: 0.8
+                Item {
+                    id: workspaceButton
+                    required property var modelData
+                    required property int index
+                    Layout.preferredWidth: root.workspaceButtonSize
+                    Layout.preferredHeight: root.workspaceButtonSize
                     
-                    SequentialAnimation on opacity {
-                        running: urgentPulse.visible
-                        loops: Animation.Infinite
-                        NumberAnimation { to: 0.3; duration: 700; easing.type: Easing.InOutQuad }
-                        NumberAnimation { to: 0.9; duration: 700; easing.type: Easing.InOutQuad }
-                    }
+                    property bool isActive: modelData.state === "focused"
+                    property bool isOccupied: modelData.isOccupied
+                    property bool isUrgent: modelData.isUrgent || false
                     
-                    SequentialAnimation on implicitWidth {
-                        running: urgentPulse.visible
-                        loops: Animation.Infinite
-                        NumberAnimation { to: workspaceButtonSize * 1.1; duration: 700; easing.type: Easing.InOutQuad }
-                        NumberAnimation { to: workspaceButtonSize; duration: 700; easing.type: Easing.InOutQuad }
-                    }
-                    
-                    SequentialAnimation on implicitHeight {
-                        running: urgentPulse.visible
-                        loops: Animation.Infinite
-                        NumberAnimation { to: workspaceButtonSize * 1.1; duration: 700; easing.type: Easing.InOutQuad }
-                        NumberAnimation { to: workspaceButtonSize; duration: 700; easing.type: Easing.InOutQuad }
-                    }
-                }
-                
-                // Empty workspace dot (enhanced visibility)
-                Rectangle {
-                    id: workspaceDot
-                    anchors.centerIn: parent
-                    visible: !workspaceButton.isOccupied
-                    
-                    implicitWidth: workspaceButton.isActive ? 10 : 6
-                    implicitHeight: implicitWidth
-                    radius: implicitWidth / 2
-                    
-                    color: ColorService.colorPalette.accentPrimary
-                    
-                    Behavior on implicitWidth {
-                        NumberAnimation { 
-                            duration: 250
-                            easing.type: Easing.OutCubic
+                    // GPU-accelerated scale using transform
+                    transform: Scale {
+                        id: scaleTransform
+                        origin.x: root.workspaceButtonSize / 2
+                        origin.y: root.workspaceButtonSize / 2
+                        xScale: 1.0
+                        yScale: 1.0
+                        
+                        Behavior on xScale {
+                            NumberAnimation { 
+                                duration: 150
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                        
+                        Behavior on yScale {
+                            NumberAnimation { 
+                                duration: 150
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
                     
-                    Behavior on color {
-                        ColorAnimation { duration: 200 }
-                    }
-                }
-                
-                // App icon with better sizing
-                IconImage {
-                    id: appIcon
-                    anchors.centerIn: parent
-                    visible: workspaceButton.isOccupied && modelData.app
-                    
-                    property var entry: visible ? DesktopEntries.heuristicLookup(modelData.app) : null
-                    
-                    source: Quickshell.iconPath(entry?.icon)
-                    
-                    // Larger icon for active workspace
-                    implicitSize: 24
-                    smooth: true
-                    antialiasing: true
-                    asynchronous: true
-                    mipmap: true
-                    opacity: 0
-                    Component.onCompleted: {
-                        fadeIn.start()
-                    }
-                    
-                    NumberAnimation on opacity {
-                        id: fadeIn
-                        to: workspaceButton.isActive ? 1.0 : 0.85
-                        duration: 300
-                        easing.type: Easing.OutCubic
-                    }
-                    
-                    
-                    Behavior on opacity {
-                        NumberAnimation { duration: 200 }
-                    }
-                }
-                
-                // Workspace number badge (bottom-right corner)
-                Rectangle {
-                    id: numberBadge
-                    visible: workspaceButton.isOccupied && mouseArea.containsMouse
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    anchors.rightMargin: -2
-                    anchors.bottomMargin: -2
-                    
-                    implicitWidth: 14
-                    implicitHeight: 14
-                    radius: 7
-                    
-                    color: ColorService.colorPalette.accentPrimary
-                    border.width: 1.5
-                    border.color: ColorService.colorPalette.backgroundSecondary
-                    
-                    opacity: 0
-                    scale: 0.8
-                    
-                    Behavior on opacity {
-                        NumberAnimation { duration: 150 }
-                    }
-                    
-                    Behavior on scale {
-                        NumberAnimation { 
-                            duration: 200
-                            easing.type: Easing.OutBack
-                            easing.overshoot: 1.5
-                        }
-                    }
-                    
-                    RavenText {
+                    Item {
                         anchors.centerIn: parent
-                        text: modelData.workspaceId
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        color: ColorService.colorPalette.accentonPrimary
-                    }
-                }
-                
-                // Workspace number overlay for empty workspaces
-                RavenText {
-                    id: workspaceNumber
-                    anchors.centerIn: parent
-                    text: modelData.workspaceId
-                    font.pixelSize: 11
-                    font.weight: Font.Bold
-                    color: workspaceButton.isActive
-                        ? ColorService.colorPalette.accentonPrimary
-                        : ColorService.colorPalette.textSecondary
-                    opacity: 0
-                    scale: 0.9
-                    
-                    Behavior on opacity {
-                        NumberAnimation { duration: 150 }
-                    }
-                    
-                    Behavior on scale {
-                        NumberAnimation { 
-                            duration: 200
-                            easing.type: Easing.OutBack
+                        implicitWidth: root.workspaceButtonSize
+                        implicitHeight: root.workspaceButtonSize
+                        
+                        // Urgent pulse indicator
+                        Rectangle {
+                            id: urgentPulse
+                            anchors.centerIn: parent
+                            implicitWidth: parent.implicitWidth
+                            implicitHeight: parent.implicitHeight
+                            radius: implicitWidth / 2
+                            color: "transparent"
+                            border.width: 2.5
+                            border.color: "#ff5555"
+                            visible: workspaceButton.isUrgent
+                            opacity: 0.8
+                            
+                            SequentialAnimation on opacity {
+                                running: urgentPulse.visible
+                                loops: Animation.Infinite
+                                NumberAnimation { to: 0.3; duration: 700; easing.type: Easing.InOutQuad }
+                                NumberAnimation { to: 0.9; duration: 700; easing.type: Easing.InOutQuad }
+                            }
+                            
+                            // GPU transform for pulse instead of size changes
+                            transform: Scale {
+                                origin.x: urgentPulse.width / 2
+                                origin.y: urgentPulse.height / 2
+                                
+                                SequentialAnimation on xScale {
+                                    running: urgentPulse.visible
+                                    loops: Animation.Infinite
+                                    NumberAnimation { to: 1.1; duration: 700; easing.type: Easing.InOutQuad }
+                                    NumberAnimation { to: 1.0; duration: 700; easing.type: Easing.InOutQuad }
+                                }
+                                
+                                SequentialAnimation on yScale {
+                                    running: urgentPulse.visible
+                                    loops: Animation.Infinite
+                                    NumberAnimation { to: 1.1; duration: 700; easing.type: Easing.InOutQuad }
+                                    NumberAnimation { to: 1.0; duration: 700; easing.type: Easing.InOutQuad }
+                                }
+                            }
+                        }
+                        
+                        // Dot for empty workspace
+                        Rectangle {
+                            id: workspaceDot
+                            anchors.centerIn: parent
+                            visible: !workspaceButton.isOccupied
+                            
+                            implicitWidth: workspaceButton.isActive ? 10 : 6
+                            implicitHeight: implicitWidth
+                            radius: implicitWidth / 2
+                            
+                            color: ColorService.colorPalette.accentSecondary
+                            
+                            Behavior on implicitWidth {
+                                NumberAnimation { 
+                                    duration: 200
+                                    easing.type: Easing.OutCubic
+                                }
+                            }
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                        }
+                        
+                        // App icon
+                        IconImage {
+                            id: appIcon
+                            anchors.centerIn: parent
+                            visible: workspaceButton.isOccupied && modelData.app
+                            
+                            property var entry: visible ? DesktopEntries.heuristicLookup(modelData.app) : null
+                            
+                            source: Quickshell.iconPath(entry?.icon)
+                            
+                            implicitSize: root.workspaceButtonSize * 0.7
+                            smooth: true
+                            antialiasing: true
+                            asynchronous: true
+                            mipmap: true
+                            
+                            opacity: workspaceButton.isActive ? 1.0 : 0.85
+                            
+                            Behavior on opacity {
+                                NumberAnimation { 
+                                    duration: 150
+                                    easing.type: Easing.OutCubic
+                                }
+                            }
+                        }
+                        
+                        // Number badge on hover (occupied workspace)
+                        Rectangle {
+                            id: numberBadge
+                            visible: workspaceButton.isOccupied && mouseArea.containsMouse
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.rightMargin: -2
+                            anchors.bottomMargin: -2
+                            
+                            implicitWidth: 14
+                            implicitHeight: 14
+                            radius: 7
+                            
+                            color: ColorService.colorPalette.accentPrimary
+                            border.width: 1.5
+                            border.color: ColorService.colorPalette.backgroundSecondary
+                            
+                            opacity: 0
+                            
+                            // GPU transform for scale
+                            transform: Scale {
+                                origin.x: numberBadge.width / 2
+                                origin.y: numberBadge.height / 2
+                                xScale: 0.8
+                                yScale: 0.8
+                                
+                                Behavior on xScale {
+                                    NumberAnimation { 
+                                        duration: 150
+                                        easing.type: Easing.OutBack
+                                        easing.overshoot: 1.5
+                                    }
+                                }
+                                
+                                Behavior on yScale {
+                                    NumberAnimation { 
+                                        duration: 150
+                                        easing.type: Easing.OutBack
+                                        easing.overshoot: 1.5
+                                    }
+                                }
+                            }
+                            
+                            Behavior on opacity {
+                                NumberAnimation { duration: 100 }
+                            }
+                            
+                            RavenText {
+                                anchors.centerIn: parent
+                                text: modelData.workspaceId
+                                font.pixelSize: 9
+                                font.weight: Font.Bold
+                                color: ColorService.colorPalette.accentonPrimary
+                            }
+                        }
+                        
+                        // Workspace number on hover (empty workspace)
+                        RavenText {
+                            id: workspaceNumber
+                            anchors.centerIn: parent
+                            text: modelData.workspaceId
+                            font.pixelSize: 11
+                            font.weight: Font.Bold
+                            color: workspaceButton.isActive
+                                ? ColorService.colorPalette.accentonPrimary
+                                : ColorService.colorPalette.textSecondary
+                            opacity: 0
+                            
+                            // GPU transform for scale
+                            transform: Scale {
+                                origin.x: workspaceNumber.width / 2
+                                origin.y: workspaceNumber.height / 2
+                                xScale: 0.9
+                                yScale: 0.9
+                                
+                                Behavior on xScale {
+                                    NumberAnimation { 
+                                        duration: 150
+                                        easing.type: Easing.OutBack
+                                    }
+                                }
+                                
+                                Behavior on yScale {
+                                    NumberAnimation { 
+                                        duration: 150
+                                        easing.type: Easing.OutBack
+                                    }
+                                }
+                            }
+                            
+                            Behavior on opacity {
+                                NumberAnimation { duration: 100 }
+                            }
                         }
                     }
-                }
-            }
-            
-            // Mouse interaction
-            MouseArea {
-                id: mouseArea
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                hoverEnabled: true
-                
-                onClicked: {
-                    HyprlandService.activate(modelData.id);
-                }
-                
-                onEntered: {
-                    workspaceButton.hoverScale = 1.15;
                     
-                    if (!workspaceButton.isOccupied) {
-                        workspaceNumber.opacity = 0.7;
-                        workspaceNumber.scale = 1.0;
-                    } else {
-                        numberBadge.opacity = 1.0;
-                        numberBadge.scale = 1.0;
+                    MouseArea {
+                        id: mouseArea
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        hoverEnabled: true
+                        
+                        onClicked: {
+                            HyprlandService.activate(modelData.id);
+                        }
+                        
+                        onEntered: {
+                            scaleTransform.xScale = 1.15;
+                            scaleTransform.yScale = 1.15;
+                            
+                            if (!workspaceButton.isOccupied) {
+                                workspaceNumber.opacity = 0.7;
+                                workspaceNumber.transform.xScale = 1.0;
+                                workspaceNumber.transform.yScale = 1.0;
+                            } else {
+                                numberBadge.opacity = 1.0;
+                                numberBadge.transform.xScale = 1.0;
+                                numberBadge.transform.yScale = 1.0;
+                            }
+                        }
+                        
+                        onExited: {
+                            scaleTransform.xScale = 1.0;
+                            scaleTransform.yScale = 1.0;
+                            workspaceNumber.opacity = 0;
+                            workspaceNumber.transform.xScale = 0.9;
+                            workspaceNumber.transform.yScale = 0.9;
+                            numberBadge.opacity = 0;
+                            numberBadge.transform.xScale = 0.8;
+                            numberBadge.transform.yScale = 0.8;
+                        }
+                        
+                        onPressed: {
+                            scaleTransform.xScale = 0.9;
+                            scaleTransform.yScale = 0.9;
+                        }
+                        
+                        onReleased: {
+                            scaleTransform.xScale = containsMouse ? 1.15 : 1.0;
+                            scaleTransform.yScale = containsMouse ? 1.15 : 1.0;
+                        }
                     }
-                }
-                
-                onExited: {
-                    workspaceButton.hoverScale = 1.0;
-                    workspaceNumber.opacity = 0;
-                    workspaceNumber.scale = 0.9;
-                    numberBadge.opacity = 0;
-                    numberBadge.scale = 0.8;
-                }
-                
-                onPressed: {
-                    workspaceButton.hoverScale = 0.9;
-                }
-                
-                onReleased: {
-                    workspaceButton.hoverScale = containsMouse ? 1.15 : 1.0;
                 }
             }
         }

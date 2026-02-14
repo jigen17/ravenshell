@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Widgets
+import qs.config
 import qs.services
 import qs.widgets
 import qs.assets
@@ -26,7 +27,7 @@ Item {
             implicitWidth: root.implicitWidth - 4
             implicitHeight: root.implicitHeight
             radius: height / 4
-            color: ColorService.colorPalette.textPrimary
+            color: "#fdfdfd"
             antialiasing: true
 
             // === Fill inside pill ===
@@ -64,7 +65,7 @@ Item {
                 RavenIcon {
                   iconName: Icons.battery.lighting
                   iconColor: ColorService.colorPalette.backgroundPrimary
-                  iconSize: Ui.tokens.iconSize.sm
+                  iconSize: Ui.tokens.iconSize.xs
                 }
             }
 

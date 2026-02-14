@@ -9,12 +9,12 @@ import qs.config
 Item {
     id: root
 
-    implicitWidth: trayColumn.implicitWidth * 1.4
-    implicitHeight: trayColumn.implicitHeight * 1.2
+    implicitWidth: trayColumn.implicitWidth
+    implicitHeight: trayColumn.implicitHeight
     RowLayout {
         id: trayColumn
         anchors.centerIn: parent
-        spacing: Ui.tokens.spacing.sm
+        spacing: Ui.tokens.spacing.xs
         Repeater {
             model: SystemTray.items
 
@@ -29,7 +29,7 @@ Item {
                     id: trayIcon
                     anchors.centerIn: parent
                     source: trayItemContainer.modelData.id === "steam" ? Quickshell.iconPath("steam") : trayItemContainer.modelData.icon
-                    implicitSize: 22
+                    implicitSize: 24
                     antialiasing: true
                     mipmap: true
                     smooth: true

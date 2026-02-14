@@ -9,7 +9,7 @@ Singleton {
     readonly property int visibleCount: 9
     readonly property int activeWsId: Hyprland.focusedWorkspace?.id ?? 1
     property var visibleWorkspaces: []
-    
+    property var topLevels: Hyprland.toplevels.values
     // Keyboard layout tracking
     property string currentKeyboard: ""
     property string currentLayout: ""

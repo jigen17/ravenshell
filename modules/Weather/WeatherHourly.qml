@@ -29,7 +29,7 @@ Item {
             radius: 12
             implicitWidth: 145
             implicitHeight: listItem.height
-            color: index === 0 ? ColorService.colorPalette.accentSecondary : ColorService.colorPalette.backgroundSecondary
+            color: index === 0 ? ColorService.colorPalette.accentPrimary : ColorService.colorPalette.backgroundSecondary_300
 
             ColumnLayout {
                 anchors.fill: parent

@@ -69,6 +69,7 @@ QtObject {
         readonly property string fatLinesDown: ""
         readonly property string out: ""
         readonly property string outCardinal: ""
+        readonly property string bendDownLeft: "\u{e018}"
     }
 
     // ============================================
@@ -184,16 +185,16 @@ QtObject {
     // ============================================
     readonly property QtObject
     player: QtObject {
-        readonly property string play: ""
-        readonly property string pause: ""
-        readonly property string stop: ""
-        readonly property string previous: ""
-        readonly property string rewind: ""
-        readonly property string forward: ""
-        readonly property string next: ""
-        readonly property string shuffle: ""
-        readonly property string repeat: ""
-        readonly property string repeatOnce: ""
+        readonly property string play: "\u{e3d0}"
+        readonly property string pause: "\u{e39e}"
+        readonly property string stop: "\u{e46c}"
+        readonly property string previous: "\u{e5a4}"
+        readonly property string rewind: "\u{e6a8}"
+        readonly property string forward: "\u{e6a6}"
+        readonly property string next: "\u{e5a6}"
+        readonly property string shuffle: "\u{e422}"
+        readonly property string repeat: "\u{e3f6}"
+        readonly property string repeatOnce: "\u{e3f8}"
         readonly property string player: ""
         readonly property QtObject
         apps: QtObject {

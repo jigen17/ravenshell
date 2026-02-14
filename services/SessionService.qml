@@ -14,7 +14,8 @@ Singleton {
         Qt.callLater(() => Hyprland.dispatch("exit"));
     }
     function lock() {
-        Quickshell.execDetached(["qs", "ipc", "-p", "raven", "call", "lockscreen", "lock"]);
+              Quickshell.execDetached(["qs","ipc","-p","ravenshell","call","lockScreen","lock"])
+
     }
     function reboot() {
         Hyprland.dispatch("closewindow all");
@@ -25,8 +26,8 @@ Singleton {
         Qt.callLater(() => Quickshell.execDetached(["systemctl", "poweroff"]));
     }
     function suspend() {
-        root.lock();
-        Quickshell.execDetached(["systemctl", "suspend"]);
+      root.lock();
+      Qt.callLater(() => Quickshell.execDetached(["systemctl", "suspend"]));
     }
 
     ListModel {

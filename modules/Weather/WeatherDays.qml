@@ -10,7 +10,7 @@ import qs.config
 Rectangle {
     id: root
     radius: 18
-    color: ColorService.colorPalette.backgroundSecondary
+    color: ColorService.colorPalette.backgroundPrimary_300
 
     ColumnLayout {
         anchors.fill: parent

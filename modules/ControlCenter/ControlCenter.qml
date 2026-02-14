@@ -66,10 +66,8 @@ StyledPanel {
         Layout.fillWidth: true
         radius: 18
       }
-
-      CalendarWeathercard {
+      Item {
         Layout.fillHeight: true
-        Layout.fillWidth: true
-      } 
+      }
     }
 }

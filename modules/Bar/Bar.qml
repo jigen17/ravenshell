@@ -3,6 +3,7 @@ import QtQuick.Shapes
 import QtQuick.Layouts
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.services
 import qs.config
@@ -25,186 +26,215 @@ Variants {
                 left: true
             }
             margins {
-                bottom: 0
+                bottom: -2
             }
             exclusionMode: ExclusionMode.Auto
+            WlrLayershell.layer: WlrLayer.Bottom
             color: "transparent"
             implicitHeight: 45
 
             Item {
                 id: root
                 anchors.fill: parent
-                layer.enabled: true
-                layer.samples: 8
+                anchors.bottomMargin: 5
 
                 property real arcWidth: 20
                 property real arcHeight: 15
                 property real panelHeight: 40
                 property real workspaceExtraHeight: 15
-                property real notchWidth: 40
+                property real notchWidth: 20
                 property int cornerRadius: 10
-                layer.effect: MultiEffect {
-                    shadowEnabled: true
-                    shadowColor: "#40000000"
-                    shadowBlur: 0.6
-                    shadowVerticalOffset: 2
-                    shadowHorizontalOffset: 0
-                }
+                
+                // Fixed widths for static background
+                property real estimatedLeftWidth: 100
+                property real estimatedRightWidth: 300
+                property real estimatedWorkspaceWidth: 250
 
-                Shape {
+                // Static background shape - separate layer, never redraws
+                Item {
+                    id: backgroundLayer
                     anchors.fill: parent
-                    preferredRendererType: Shape.CurveRenderer
+                    z: 0
+                    layer.enabled: true
+                    layer.smooth: true
+                    layer.effect: MultiEffect {
+                        shadowEnabled: true
+                        shadowColor: Qt.rgba(ColorService.colorPalette.backgroundPrimary.r, ColorService.colorPalette.backgroundPrimary.g, ColorService.colorPalette.backgroundPrimary.b, 0.8)
+                        shadowBlur: 0.2
+                        shadowVerticalOffset: 2
+                        shadowHorizontalOffset: 0
+                    }
+                    
+                    Shape {
+                        anchors.fill: parent
+                        preferredRendererType: Shape.CurveRenderer
+                        ShapePath {
+                            strokeWidth: 0
+                            strokeColor: "transparent"
+                            fillColor: ColorService.colorPalette.backgroundPrimary
 
-                    ShapePath {
-                        strokeWidth: 0
-                        strokeColor: "transparent"
-                        fillColor: ColorService.colorPalette.backgroundPrimary
+                            startX: 0
+                            startY: 0
 
-                        startX: 0
-                        startY: 0
+                            PathLine {
+                                relativeX: root.width
+                                relativeY: 0
+                            }
 
-                        // Top edge: left to right
-                        PathLine {
-                            relativeX: root.width
-                            relativeY: 0
-                        }
+                            PathLine {
+                                relativeX: 0
+                                relativeY: root.height
+                            }
 
-                        // Right edge: top to bottom
-                        PathLine {
-                            relativeX: 0
-                            relativeY: root.height
-                        }
+                            PathLine {
+                                relativeX: -(root.estimatedRightWidth - 10)
+                                relativeY: 0
+                            }
 
-                        // Bottom edge: move left to start of right section curve
-                        PathLine {
-                            relativeX: -(rightRow.width)
-                            relativeY: 0
-                        }
+                            PathQuad {
+                                relativeX: -root.notchWidth - 10
+                                relativeY: -root.height / 2
+                                relativeControlX: -root.notchWidth / 2
+                                relativeControlY: 0
+                            }
 
-                        // Right section: smooth S-curve going UP
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: -root.height / 2
-                            relativeControlX: -root.notchWidth / 2
-                            relativeControlY: -2
-                        }
+                            PathQuad {
+                                relativeX: -root.notchWidth - 20
+                                relativeY: -(root.height / 2 - 10)
+                                relativeControlX: -root.notchWidth / 2
+                                relativeControlY: -(root.height / 4)
+                            }
 
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: -(root.height / 2 - 10)
-                            relativeControlX: -4
-                            relativeControlY: -(root.height / 2 - 10)
-                        }
+                            PathLine {
+                                relativeX: -(root.width / 2 - root.estimatedWorkspaceWidth / 2 - root.estimatedRightWidth - root.notchWidth * 3 - 40)
+                                relativeY: 0
+                            }
 
-                        PathLine {
-                            relativeX: -(root.width / 2 - workspaces.width / 2 - rightRow.width - root.notchWidth * 2)
-                            relativeY: 0
-                        }
+                            PathQuad {
+                                relativeX: -root.notchWidth - 10
+                                relativeY: root.height / 2
+                                relativeControlX: -root.notchWidth / 2
+                                relativeControlY: 0
+                            }
+                            PathQuad {
+                                relativeX: -root.notchWidth
+                                relativeY: root.height / 2 - 10
+                                relativeControlX: -root.notchWidth / 2
+                                relativeControlY: root.height / 4
+                            }
 
-                        
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: root.height / 2
-                            relativeControlX: -root.notchWidth / 2
-                            relativeControlY: 2
-                        }
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: root.height / 2 - 10
-                            relativeControlX: -4
-                            relativeControlY: root.height / 2 - 10
-                        }
+                            PathLine {
+                                relativeX: -(root.estimatedWorkspaceWidth - 20)
+                                relativeY: 0
+                            }
 
-                        // Bottom of workspace area
-                        PathLine {
-                            relativeX: -(workspaces.width)
-                            relativeY: 0
-                        }
+                            PathQuad {
+                                relativeX: -root.notchWidth - 10
+                                relativeY: -root.height / 2
+                                relativeControlX: -root.notchWidth / 2
+                                relativeControlY: 0
+                            }
 
-                        // Workspace left side: MIRROR of workspace right (going UP instead of DOWN)
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: -(root.height / 2)
-                            relativeControlX: -root.notchWidth / 2
-                            relativeControlY: -2
-                        }
+                            PathQuad {
+                                relativeX: -root.notchWidth - 20
+                                relativeY: -(root.height / 2 - 10)
+                                relativeControlX: -root.notchWidth / 2
+                                relativeControlY: -(root.height / 4)
+                            }
 
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: -(root.height / 2 - 10)
-                            relativeControlX: -4
-                            relativeControlY: -(root.height / 2 - 10)
-                        }
+                            PathLine {
+                                relativeX: -(root.width / 2 - root.estimatedLeftWidth - root.estimatedWorkspaceWidth / 2 - root.notchWidth * 2 - 80)
+                                relativeY: 0
+                            }
 
-                        // Top edge: continue left to left section
-                        PathLine {
-                            relativeX: -(root.width / 2 - leftRow.width - workspaces.width / 2 - root.notchWidth * 2 - 10)
-                            relativeY: 0
-                        }
+                            PathQuad {
+                                relativeX: -root.notchWidth - 10
+                                relativeY: root.height / 2
+                                relativeControlX: -root.notchWidth / 1.5
+                                relativeControlY: 2
+                            }
+                            PathQuad {
+                                relativeX: -root.notchWidth
+                                relativeY: root.height / 2 - 10
+                                relativeControlX: -root.notchWidth / 2
+                                relativeControlY: root.height / 4
+                            }
+                            PathLine {
+                                relativeX: -(root.estimatedLeftWidth + 20)
+                                relativeY: 0
+                            }
 
-                        // Left section: MIRROR of right section (going DOWN instead of UP)
-                        
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: root.height / 2
-                            relativeControlX: -root.notchWidth / 2
-                            relativeControlY: 2
-                        }
-
-                        PathQuad {
-                            relativeX: -root.notchWidth / 2
-                            relativeY: root.height / 2 - 10
-                            relativeControlX: -4
-                            relativeControlY: root.height / 2 - 10
-                        }
-                        // Bottom edge: finish left side
-                        PathLine {
-                            relativeX: -(leftRow.width + 10)
-                            relativeY: 0
-                        }
-
-                        // Left edge: close the path
-                        PathLine {
-                            relativeX: 0
-                            relativeY: -root.height
+                            PathLine {
+                                relativeX: 0
+                                relativeY: -root.height
+                            }
                         }
                     }
                 }
 
-                RowLayout {
-                    id: leftRow
-                    spacing: Ui.tokens.spacing.md
+                // Left content - isolated layer
+                Item {
+                    id: leftContainer
                     anchors {
                         left: parent.left
                         top: parent.top
+                        bottom: parent.bottom
                         leftMargin: 10
-                        verticalCenter: parent.verticalCenter
                     }
-                    ResourceItem {
-                        Layout.alignment: Qt.AlignVCenter
+                    width: childrenRect.width
+                    z: 1
+                    layer.enabled: true
+                    layer.smooth: true
+                    
+                    RowLayout {
+                        id: leftRow
+                        spacing: Ui.tokens.spacing.md
+                        anchors.verticalCenter: parent.verticalCenter
+                        ResourceItem {
+                            Layout.alignment: Qt.AlignVCenter
+                        }
                     }
                 }
 
-                Workspaces {
-                    id: workspaces
+                // Center content - isolated layer
+                Item {
+                    id: centerContainer
                     anchors.centerIn: parent
+                    height: childrenRect.height
+                    z: 1
+                    layer.enabled: true
+                    layer.smooth: true
+                    
+                    Workspaces {
+                        id: workspaces
+                    }
                 }
 
-                RowLayout {
-                    id: rightRow
+                // Right content - isolated layer
+                Item {
+                    id: rightContainer
                     anchors {
                         right: parent.right
                         top: parent.top
-                        verticalCenter: parent.verticalCenter
+                        bottom: parent.bottom
                         rightMargin: 10
                     }
-                    spacing: Ui.tokens.spacing.md
-                    TrayItem {}
-                    TimeItem {}
-                    RavenIcon {
-                        iconName: Icons.notifications.bell
+                    width: childrenRect.width
+                    z: 1
+                    layer.enabled: true
+                    layer.smooth: true
+                    
+                    RowLayout {
+                        id: rightRow
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Ui.tokens.spacing.md
+                        TrayItem {}
+                        TimeItem {}
+                        RavenIcon {
+                            iconName: Icons.notifications.bell
+                        }
+                        BatteryIndicator {}
                     }
-                    BatteryIndicator {}
                 }
             }
         }

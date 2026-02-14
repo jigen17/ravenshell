@@ -10,6 +10,7 @@
 //@ pragma Env QT_FFMPEG_ENCODING_HW_DEVICE_TYPES=vaapi
 //@ pragma Env QT_QPA_NO_TABLET_EVENTS=1
 //@ pragma Env QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+//@pragma EnV QT_QPA_PLATFORMTHEME=qtengine
 import QtQuick
 import Quickshell
 import qs.modules.Bar
@@ -21,6 +22,8 @@ import qs.modules.OSD
 import qs.modules.ControlCenter
 import qs.modules.Lockscreen
 import qs.modules.Weather
+import qs.modules.Anime
+import qs.services
 ShellRoot {
   Bar{}
   Wallpaper{}
@@ -32,5 +35,7 @@ ShellRoot {
   ControlCenter{}
   Lock{}
   Weather{}
+  Anime{}
+  IdleService{}
 }
 
