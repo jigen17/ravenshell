@@ -2,13 +2,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
-
+import qs.config
 Scope {
-
   IdleMonitor {
-
-    enabled: true
+    enabled: !GlobalStatesService.keepAwake
     timeout: 300
+
 
     onIsIdleChanged: {
       if (isIdle) {

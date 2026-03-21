@@ -2,6 +2,10 @@ import QtQuick
 pragma Singleton
 
 QtObject {
+    //=============================================
+    // WEATHER
+    // ============================================
+
     // Icon font
     readonly property string font: "Phosphor-Bold"
     // ============================================
@@ -21,14 +25,16 @@ QtObject {
         readonly property string grid_squares: "" //"u\{e464}"
     }
     // ============================================
+
     //  ACTION ICONS
     // ===========================================
-     readonly property QtObject
-     actions: QtObject {
-       readonly property string trash: "\u{e4a6}"
-       readonly property string trash_simple : "\u{e4a8}"
-     }
+    readonly property QtObject
+    actions: QtObject {
+        readonly property string trash: "\u{e4a6}"
+        readonly property string trash_simple: "\u{e4a8}"
+    }
     // ============================================
+
     // POWER MENU
     // ============================================
     readonly property QtObject
@@ -45,7 +51,7 @@ QtObject {
     // ============================================
     readonly property QtObject
     carets: QtObject {
-        readonly property string left: "\u{e158}"
+        readonly property string left: "\u{e138}"
         readonly property string right: "\u{e13a}"
         readonly property string up: "\u{e13c}"
         readonly property string down: "\u{e136}"
@@ -138,8 +144,8 @@ QtObject {
     // ============================================
     readonly property QtObject
     toggles: QtObject {
-      readonly property string moon: "\u{e330}"
-              readonly property string moonstars: "\u{e58e}"
+        readonly property string moon: "\u{e330}"
+        readonly property string moonstars: "\u{e58e}"
         readonly property string caffeine: "\u{e1c2}"
         readonly property string gameMode: ""
         readonly property string visibility_on: "\u{e220}"
@@ -151,8 +157,15 @@ QtObject {
     // ============================================
     readonly property QtObject
     utilities: QtObject {
-      readonly property string toolbox: "\u{eca0}"
-      readonly property string colorPicker: "\u{e568}"
+        readonly property string toolbox: "\u{eca0}"
+        readonly property string colorPicker: "\u{e568}"
+        readonly property string eraser: "\u{e21e}"
+        readonly property string link: "\u{e2e2}"
+        readonly property string link_break: "\u{e2e4}"
+        readonly property string dismiss: "\u{e4f6}"
+        readonly property string dismiss_circle: "\u{e4f8}"
+        readonly property string hourglass: "\u{e2b2}"
+        readonly property string agreement: "\u{e582}"
         readonly property QtObject
         screenshot: QtObject {
             readonly property string region: ""
@@ -256,11 +269,11 @@ QtObject {
     battery: QtObject {
         readonly property string lighting: "\u{e2de}"
         readonly property string plug: ""
-        readonly property string full: ""
-        readonly property string high: ""
-        readonly property string medium: ""
-        readonly property string low: ""
-        readonly property string empty: ""
+        readonly property string full: "\u{e0c0}"
+        readonly property string high: "\u{e0c2}"
+        readonly property string medium: "\u{e0c6}"
+        readonly property string low: "\u{e0c4}"
+        readonly property string empty: "\u{e0b3}"
         readonly property string charging: ""
     }
 
@@ -305,6 +318,7 @@ QtObject {
         readonly property string general: "\u{eba4}"
     }
     // ============================================
+
     // SECURITY
     // ============================================
     readonly property QtObject
@@ -368,15 +382,11 @@ QtObject {
         readonly property string question: "\u{e3e8}"
     }
 
-    //=============================================
-    // WEATHER
-    // ============================================
-    
-  readonly property QtObject
-     weather: QtObject {
-      readonly property string drop: "\u{e210}"
-      readonly property string umbrella: "\u{e684}"
-      readonly property string wind: "\u{e5d2}"
-
+    readonly property QtObject
+    weather: QtObject {
+        readonly property string drop: "\u{e210}"
+        readonly property string umbrella: "\u{e684}"
+        readonly property string wind: "\u{e5d2}"
     }
- }
+
+}

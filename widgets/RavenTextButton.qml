@@ -10,7 +10,8 @@ Rectangle {
     
     // Public properties
     property alias text: text.text
-    property alias fontFamily: text.font.family
+
+    property alias font: text.font
     property color textColor: ColorService.colorPalette.textPrimary
     property int fontSize: Ui.tokens.fontSize.sm
     property int buttonPadding: 0
@@ -21,7 +22,7 @@ Rectangle {
     property bool enabled: false
 
     implicitWidth: text.implicitWidth + root.buttonPadding * 2
-    implicitHeight: implicitWidth
+    implicitHeight: text.implicitHeight + root.buttonPadding 
     
     // Signals
     signal clicked
@@ -110,8 +111,6 @@ Rectangle {
     }
     
     // Accessibility
-    Accessible.role: Accessible.Button
-    Accessible.name: root.iconName
-    Accessible.onPressAction: if (root.enabled) root.clicked()
+  
 }
 

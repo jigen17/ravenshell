@@ -35,11 +35,7 @@ Singleton {
         loadRecentApps();
         loadFavorites();
         
-        // Debug: Print some app categories
-        for (let i = 0; i < Math.min(5, applications.length); i++) {
-            const app = applications[i];
-            console.log("App:", app.name, "Categories:", JSON.stringify(app.categories));
-        }
+
     }
     
     // Watch for changes in applications

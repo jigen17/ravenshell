@@ -4,4 +4,6 @@ import Quickshell
 
 Singleton {
   id: root
+
+  property bool keepAwake: false
 }

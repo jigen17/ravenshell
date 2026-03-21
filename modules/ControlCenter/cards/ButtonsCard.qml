@@ -6,56 +6,31 @@ import qs.config
 import qs.services
 import qs.widgets
 
-Rectangle {
-    id: root
-
+Item {
+  id: root
+  Rectangle {
+    anchors.centerIn: parent
     color: ColorService.colorPalette.backgroundSecondary_300
-    radius: 14
-
+    radius: 18
+  }
     RowLayout {
-        anchors.fill: parent
-        anchors.margins: Ui.tokens.spacing.sm
-
+        anchors.centerIn: parent
+        spacing: Ui.tokens.spacing.md
         ButtonIcon {
             iconName: Icons.media.images
-            buttonPadding: Ui.tokens.spacing.sm
             onClicked: Quickshell.execDetached(["qs", "ipc","-p","ravenshell","call","wallpaperPicker","open"])
         }
-
-        Item {
-            Layout.fillWidth: true
-        }
-
         ButtonIcon {
             iconName: Icons.devices.camera
-            buttonPadding: Ui.tokens.spacing.sm
         }
-
-        Item {
-            Layout.fillWidth: true
-        }
-
         ButtonIcon {
             iconName: Icons.devices.video_camera
-            buttonPadding: Ui.tokens.spacing.sm
         }
-
-        Item {
-            Layout.fillWidth: true
-        }
-
         ButtonIcon {
             iconName: Icons.utilities.colorPicker
-            buttonPadding: Ui.tokens.spacing.sm
         }
-
-        Item {
-            Layout.fillWidth: true
-        }
-
         ButtonIcon {
             iconName: Icons.office.clipboard
-            buttonPadding: Ui.tokens.spacing.sm
         }
 
     }

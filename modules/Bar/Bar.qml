@@ -29,7 +29,7 @@ Variants {
                 bottom: -2
             }
             exclusionMode: ExclusionMode.Auto
-            WlrLayershell.layer: WlrLayer.Bottom
+            WlrLayershell.layer: WlrLayer.Top
             color: "transparent"
             implicitHeight: 45
 
@@ -44,34 +44,40 @@ Variants {
                 property real workspaceExtraHeight: 15
                 property real notchWidth: 20
                 property int cornerRadius: 10
-                
+
                 // Fixed widths for static background
                 property real estimatedLeftWidth: 100
-                property real estimatedRightWidth: 300
+                property real estimatedRightWidth: 320
                 property real estimatedWorkspaceWidth: 250
+
+                // Get monitor name from parent panel's screen
+                property string monitorName: screen?.name ?? ""
 
                 // Static background shape - separate layer, never redraws
                 Item {
                     id: backgroundLayer
                     anchors.fill: parent
-                    z: 0
-                    layer.enabled: true
-                    layer.smooth: true
-                    layer.effect: MultiEffect {
+                    MultiEffect {
+                        source: backgroundShape
+                        anchors.fill: parent
                         shadowEnabled: true
                         shadowColor: Qt.rgba(ColorService.colorPalette.backgroundPrimary.r, ColorService.colorPalette.backgroundPrimary.g, ColorService.colorPalette.backgroundPrimary.b, 0.8)
                         shadowBlur: 0.2
                         shadowVerticalOffset: 2
                         shadowHorizontalOffset: 0
+                        blurEnabled: true
+                        blur: 1.0
+                        blurMax: 32
                     }
-                    
+
                     Shape {
+                        id: backgroundShape
                         anchors.fill: parent
                         preferredRendererType: Shape.CurveRenderer
                         ShapePath {
                             strokeWidth: 0
                             strokeColor: "transparent"
-                            fillColor: ColorService.colorPalette.backgroundPrimary
+                            fillColor: Qt.rgba(ColorService.colorPalette.backgroundPrimary.r, ColorService.colorPalette.backgroundPrimary.g, ColorService.colorPalette.backgroundPrimary.b, 0.7)
 
                             startX: 0
                             startY: 0
@@ -172,70 +178,44 @@ Variants {
                     }
                 }
 
-                // Left content - isolated layer
-                Item {
-                    id: leftContainer
+                RowLayout {
+                    id: leftRow
+                    spacing: Ui.tokens.spacing.md
                     anchors {
+                        verticalCenter: parent.verticalCenter
                         left: parent.left
-                        top: parent.top
-                        bottom: parent.bottom
-                        leftMargin: 10
+                        leftMargin: 20
                     }
-                    width: childrenRect.width
-                    z: 1
-                    layer.enabled: true
-                    layer.smooth: true
-                    
-                    RowLayout {
-                        id: leftRow
-                        spacing: Ui.tokens.spacing.md
-                        anchors.verticalCenter: parent.verticalCenter
-                        ResourceItem {
-                            Layout.alignment: Qt.AlignVCenter
-                        }
+                    ResourceItem {
+                        Layout.alignment: Qt.AlignVCenter
                     }
                 }
 
-                // Center content - isolated layer
-                Item {
-                    id: centerContainer
+                Workspaces {
+                    id: workspaces
                     anchors.centerIn: parent
-                    height: childrenRect.height
-                    z: 1
-                    layer.enabled: true
-                    layer.smooth: true
-                    
-                    Workspaces {
-                        id: workspaces
-                    }
+                    monitorName: root.monitorName
                 }
 
-                // Right content - isolated layer
-                Item {
-                    id: rightContainer
+                RowLayout {
+                    id: rightRow
+
                     anchors {
+                        verticalCenter: parent.verticalCenter
                         right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
-                        rightMargin: 10
+                        rightMargin: 20
                     }
-                    width: childrenRect.width
-                    z: 1
-                    layer.enabled: true
-                    layer.smooth: true
-                    
-                    RowLayout {
-                        id: rightRow
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Ui.tokens.spacing.md
-                        TrayItem {}
-                        TimeItem {}
-                        RavenIcon {
-                            iconName: Icons.notifications.bell
-                        }
-                        BatteryIndicator {}
+                    spacing: Ui.tokens.spacing.md
+                    onWidthChanged: root.estimatedRightWidth = width + 30
+                    TrayItem {}
+                    TimeItem {}
+                    RavenIcon {
+                        iconName: Icons.notifications.bell
                     }
+                    BatteryIndicator {}
                 }
+
+                Component.onCompleted: console.log("App", DesktopEntries.heuristicLookup("dolphin"))
             }
         }
     }

@@ -1,127 +1,107 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import qs.config
+import Quickshell.Hyprland
 import qs.services
 import qs.widgets
-
+import qs.assets
 StyledPopup {
-  id: root
-  property alias menu: menuOpener.menu
-  
-  QsMenuOpener { 
-    id: menuOpener
-  }
-  
-  contentItem: ColumnLayout {
-    anchors.fill: parent
-    spacing: 1
-    Keys.onEscapePressed: root.closeWindow()
-    Repeater { 
-      model: menuOpener.children
-      
-      delegate: Rectangle {
-        required property QsMenuEntry modelData
-        
-        Layout.preferredWidth: 200
-        Layout.preferredHeight: modelData.isSeparator ? 1 : rowContent.implicitHeight * 1.5
-        
-        color: {
-          if (modelData.isSeparator) {
-            return ColorService.colorPalette.textSecondary
-          }
-          return mouseArea.containsMouse ? 
-            ColorService.colorPalette.accentPrimary :
-            "transparent"
+    id: root
+    property QsMenuHandle menu
+
+
+
+    contentItem: StackView {
+        id: stackView
+        implicitWidth: 240
+        implicitHeight: currentItem ? currentItem.implicitHeight : 0
+
+        pushEnter:  Transition { NumberAnimation { duration: 0 } }
+        pushExit:   Transition { NumberAnimation { duration: 0 } }
+        popEnter:   Transition { NumberAnimation { duration: 0 } }
+        popExit:    Transition { NumberAnimation { duration: 0 } }
+
+        initialItem: TrayMenu {
+            handle: root.menu
         }
-        
-        opacity: modelData.enabled ? 1.0 : 0.5
-        radius: height / 3
-        
-        RowLayout {
-          id: rowContent
-          anchors.left: parent.left
-          anchors.verticalCenter: parent.verticalCenter
-          anchors.leftMargin: 10
-          spacing: 8
-          visible: !modelData.isSeparator
-          
-          // Checkbox/Radio indicator
-          Rectangle {
-            Layout.preferredWidth: 16
-            Layout.preferredHeight: 16
-            Layout.alignment: Qt.AlignVCenter
-            
-            visible: modelData.buttonType !== QsMenuButtonType.None
-            color: "transparent"
-            border.color: ColorService.colorPalette.textPrimary
-            border.width: 1
-            radius: modelData.buttonType === QsMenuButtonType.RadioButton ? 8 : 2
-            
+
+        component TrayMenu: ColumnLayout {
+            id: page
+            property QsMenuHandle handle
+            property bool isSubMenu: false
+            spacing: 2
+
+            property bool show: false
+            opacity: show ? 1.0 : 0.0
+            scale:   show ? 1.0 : 0.95
+
+            Component.onCompleted:    show = true
+            StackView.onActivating:   show = true
+            StackView.onDeactivating: show = false
+
+            Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.InOutQuad } }
+            Behavior on scale   { NumberAnimation { duration: 150; easing.type: Easing.InOutQuad } }
+
+            QsMenuOpener {
+                id: opener
+                menu: page.handle
+            }
+
+            // Back button
             Rectangle {
-              anchors.centerIn: parent
-              width: 8
-              height: 8
-              radius: modelData.buttonType === QsMenuButtonType.RadioButton ? 4 : 1
-              color: ColorService.colorPalette.textPrimary
-              visible: modelData.checkState === Qt.Checked
+                visible: page.isSubMenu
+                Layout.fillWidth: true
+                implicitHeight: 32
+                radius: 4
+                color: backArea.containsMouse
+                    ? ColorService.colorPalette.accentSecondary
+                    : "transparent"
+                Behavior on color { ColorAnimation { duration: 150 } }
+
+                RowLayout {
+                    anchors { fill: parent; leftMargin: 8; rightMargin: 8 }
+                    spacing: 6
+                    RavenIcon {
+                        iconName: Icons.carets.left
+                        iconSize: 12
+                        opacity: 0.6
+                    }
+                    RavenText {
+                        text: "Back"
+                        font.pixelSize: 13
+                        color: ColorService.colorPalette.textPrimary
+                        Layout.fillWidth: true
+                    }
+                }
+
+                MouseArea {
+                    id: backArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: stackView.pop()
+                }
             }
-          }
-          
-          // Icon
-          Image {
-            Layout.preferredWidth: 20
-            Layout.preferredHeight: 20
-            Layout.alignment: Qt.AlignVCenter
-            
-            source: modelData.icon
-            sourceSize.width: 20
-            sourceSize.height: 20
-            visible: modelData.icon !== ""
-            fillMode: Image.PreserveAspectFit
-          }
-          
-          // Text
-           Text {
-            Layout.maximumWidth: 180
-            Layout.alignment: Qt.AlignVCenter
-            text: modelData.text
-            color: ColorService.colorPalette.textPrimary
-            font.family: Settings.config.fonts.primary
-            font.pixelSize: Ui.tokens.fontSize.sm
-            wrapMode: Text.WordWrap
-            elide: Text.ElideLeft
-          }
-          
-          // Submenu indicator
-          Text {
-            Layout.alignment: Qt.AlignVCenter
-            text: "›"
-            color: ColorService.colorPalette.textSecondary
-            font.pixelSize: 16
-            visible: modelData.hasChildren
-          }
-        }
-        
-        MouseArea {
-          id: mouseArea
-          anchors.fill: parent
-          hoverEnabled: true
-          enabled: !modelData.isSeparator && modelData.enabled
-          
-          onClicked: {
-            if (modelData.hasChildren) {
-              // Open submenu if it has children
-              modelData.display(root, mouse.x, mouse.y)
-            } else {
-              // Trigger the menu action
-              modelData.triggered()
-              root.closeWindow()
+
+            Repeater {
+                model: opener.children
+                delegate: TrayMenuItem {
+                    required property QsMenuEntry modelData
+                    trayItem: modelData
+                    Layout.fillWidth: true
+                    onNewmenu: stackView.push(subMenuComp.createObject(null, {
+                        handle: modelData,
+                        isSubMenu: true
+                      }))
+                    onClicked: root.closeWindow();
+                }
             }
-          }
         }
-      }
+
+        Component {
+            id: subMenuComp
+            TrayMenu {}
+        }
     }
-  }
 }

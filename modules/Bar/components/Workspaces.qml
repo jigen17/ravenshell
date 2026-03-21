@@ -9,19 +9,29 @@ import qs.widgets
 Item {
     id: root
     implicitHeight: 28
-    
+    implicitWidth: 100
     property int widgetPadding: 8
     property int workspaceButtonSize: 24
     property int animDuration: 200
     
-    // LAYER 1: Static background (cached separately)
+    // Auto-detect monitor from parent panel
+    property string monitorName: {
+        if (parent && parent.screen) {
+            // If parent has screen property (from PanelWindow)
+            return parent.screen.name;
+        } else if (parent && parent.outputs) {
+            // If parent is a monitor object
+            return parent.name;
+        }
+        return ""; // Fallback: will use all workspaces
+    }
+    
+    // LAYER 1: Static background
     Rectangle {
         id: background
         anchors.fill: parent
         color: ColorService.colorPalette.backgroundSecondary
         radius: 20
-        layer.enabled: true  // Cache just the background
-        z: 0
     }
     
     WheelHandler {
@@ -36,6 +46,11 @@ Item {
         }
     }
     
+    // Get workspaces for this monitor
+    readonly property var monitorWorkspaces: root.monitorName 
+        ? HyprlandService.getMonitorWorkspaces(root.monitorName)
+        : HyprlandService.visibleWorkspaces
+    
     // LAYER 2: Content container
     Item {
         id: contentContainer
@@ -43,14 +58,13 @@ Item {
         implicitWidth: rowLayout.implicitWidth
         implicitHeight: parent.height
         
-        // Active workspace pill - positioned relative to rowLayout
+        // Active workspace pill
         Rectangle {
             id: activeHighlight
             z: 1
             
             property int activeIndex: getActiveWorkspaceIndex()
             
-            // Position at start of first button
             x: 0
             implicitWidth: workspaceButtonSize
             implicitHeight: workspaceButtonSize
@@ -59,7 +73,6 @@ Item {
             radius: implicitWidth / 2        
             color: ColorService.colorPalette.accentonSecondary
             
-            // GPU-accelerated transform (centered on buttons!)
             transform: Translate {
                 x: activeHighlight.activeIndex * root.workspaceButtonSize
                 
@@ -86,9 +99,9 @@ Item {
             spacing: 0
             z: 2
 
-            Component.onCompleted: root.implicitWidth = implicitWidth + 20
+            Component.onCompleted: root.implicitWidth = implicitWidth + 10
             Repeater {
-                model: HyprlandService.visibleWorkspaces
+                model: root.monitorWorkspaces
                 
                 Item {
                     id: workspaceButton
@@ -101,7 +114,7 @@ Item {
                     property bool isOccupied: modelData.isOccupied
                     property bool isUrgent: modelData.isUrgent || false
                     
-                    // GPU-accelerated scale using transform
+                    // GPU-accelerated scale
                     transform: Scale {
                         id: scaleTransform
                         origin.x: root.workspaceButtonSize / 2
@@ -149,7 +162,6 @@ Item {
                                 NumberAnimation { to: 0.9; duration: 700; easing.type: Easing.InOutQuad }
                             }
                             
-                            // GPU transform for pulse instead of size changes
                             transform: Scale {
                                 origin.x: urgentPulse.width / 2
                                 origin.y: urgentPulse.height / 2
@@ -204,7 +216,7 @@ Item {
                             
                             source: Quickshell.iconPath(entry?.icon)
                             
-                            implicitSize: root.workspaceButtonSize * 0.7
+                            implicitSize: root.workspaceButtonSize * 0.8
                             smooth: true
                             antialiasing: true
                             asynchronous: true
@@ -239,7 +251,6 @@ Item {
                             
                             opacity: 0
                             
-                            // GPU transform for scale
                             transform: Scale {
                                 origin.x: numberBadge.width / 2
                                 origin.y: numberBadge.height / 2
@@ -288,7 +299,6 @@ Item {
                                 : ColorService.colorPalette.textSecondary
                             opacity: 0
                             
-                            // GPU transform for scale
                             transform: Scale {
                                 origin.x: workspaceNumber.width / 2
                                 origin.y: workspaceNumber.height / 2
@@ -323,7 +333,12 @@ Item {
                         hoverEnabled: true
                         
                         onClicked: {
-                            HyprlandService.activate(modelData.id);
+                            HyprlandService.activate(modelData.workspaceId, root.monitorName);
+                        }
+                        
+                        onDoubleClicked: {
+                            // Double-click to move window to this workspace
+                            HyprlandService.dispatch("movetoworkspace " + modelData.actualWsId);
                         }
                         
                         onEntered: {
@@ -368,8 +383,8 @@ Item {
     }
     
     function getActiveWorkspaceIndex() {
-        for (let i = 0; i < HyprlandService.visibleWorkspaces.length; i++) {
-            if (HyprlandService.visibleWorkspaces[i].id === HyprlandService.activeWsId) {
+        for (let i = 0; i < root.monitorWorkspaces.length; i++) {
+            if (root.monitorWorkspaces[i].id === HyprlandService.activeWsId) {
                 return i;
             }
         }

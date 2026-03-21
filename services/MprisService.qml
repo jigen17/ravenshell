@@ -7,17 +7,27 @@ import Quickshell.Services.Mpris
 Singleton {
   id: root
   
-  property var players: Mpris.players.values
-  property var activePlayer: {
-    // First try to find a playing player
-    let playing = players.find(player => player.isPlaying);
+property var players: Mpris.players.values
+property var blackListedPlayers: ["Mozilla zen"]
+
+property var allowedPlayers: players.filter(player =>
+    !blackListedPlayers.includes(player.identity)
+)
+
+property var activePlayer: {
+    // First try to find a playing allowed player
+    let playing = allowedPlayers.find(player => player.isPlaying);
     if (playing) return playing;
-    
-    // Otherwise, use a paused player (or any player with media)
-    return players.find(player => 
-      player.playbackState !== MprisPlaybackState.Stopped
-    ) || players[0]; // fallback to first player if all stopped
-  }
+
+    // Otherwise prefer Spotify if it's allowed
+    let spotify = allowedPlayers.find(player =>
+        player.identity === "Spotify"
+    );
+    if (spotify) return spotify;
+
+    // fallback
+    return allowedPlayers[0];
+}
   function previousTrack() {
     if (activePlayer?.canControl && activePlayer?.canGoPrevious) {
       activePlayer.previous();

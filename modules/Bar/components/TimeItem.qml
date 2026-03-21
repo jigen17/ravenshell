@@ -7,72 +7,69 @@ import qs.config
 import qs.services
 import qs.widgets
 
-Rectangle {
+Item {
     id: root
     implicitHeight: 30
     implicitWidth: 140
-    color: Qt.rgba(ColorService.colorPalette.accentPrimary.r, ColorService.colorPalette.accentPrimary.g, ColorService.colorPalette.accentPrimary.b, 0.5)
-    radius: 12
 
+    // Background
+    Rectangle {
+        anchors.fill: parent
+        radius: 12
+        color: Qt.rgba(ColorService.colorPalette.accentPrimary.r, ColorService.colorPalette.accentPrimary.g, ColorService.colorPalette.accentPrimary.b, 0.5)
+    }
+
+    // Content
     RowLayout {
-        id: timeColumn
-        anchors.centerIn: parent
-        spacing: 8
-
-        Row {
-            spacing: 2
-            Layout.fillWidth: true
-            RavenText {
-                text: TimeService.hourString
-                font.family: "Nunito Heavy"
-                font.bold: true
-                horizontalAlignment: Text.AlignRight
-                Layout.preferredWidth: implicitWidth
-            }
-
-            RavenText {
-                text: ":"
-                font.family: "Nunito Heavy"
-
-                font.bold: true
-            }
-
-            RavenText {
-                text: TimeService.minuteString
-                font.family: "Nunito Heavy"
-
-                font.bold: true
-                horizontalAlignment: Text.AlignLeft
-                Layout.preferredWidth: implicitWidth
-            }
+        anchors {
+            fill: parent
+            leftMargin: 10
+            rightMargin: 10
         }
 
+        // Time display
+        Row {
+            Layout.alignment: Qt.AlignVCenter
+            spacing: 4
+            RavenText {
+                text: TimeService.hourString
+            }
+            RavenText {
+                text: ":"
+            }
+            RavenText {
+                text: TimeService.minuteString
+            }
+        }
+        Item {
+            Layout.fillWidth: true
+        }
+        // Separator
         Rectangle {
-            Layout.preferredWidth: 1
+            implicitWidth: 1
             Layout.fillHeight: true
+            Layout.topMargin: 4
+            Layout.bottomMargin: 4
             Layout.alignment: Qt.AlignCenter
             color: ColorService.colorPalette.accentPrimary
             opacity: 0.5
         }
-
-        Row {
-            spacing: 4
-            Layout.preferredWidth: 50
+        Item {
+            Layout.fillWidth: true
+        }
+        // Weather display
+        RowLayout {
+          Layout.fillWidth: true
+            spacing: 6
 
             IconImage {
-                width: 20
-                height: 20
-                anchors.verticalCenter: parent.verticalCenter
+                implicitSize: 22
                 source: Quickshell.iconPath(WeatherService.currentWeatherIcon)
             }
 
             RavenText {
-                anchors.verticalCenter: parent.verticalCenter
-                text: WeatherService.currentTemp + " °C"
-                font.family: "Nunito Heavy"
-
-                font.bold: true
-                horizontalAlignment: Text.AlignLeft
+                Layout.preferredWidth: 25
+                text: WeatherService.currentTemp + "°C"
             }
         }
     }

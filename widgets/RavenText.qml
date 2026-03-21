@@ -11,6 +11,7 @@ Text {
   color: root.textColor
   font.pixelSize: root.fontSize
   font.family: Settings.config.fonts.primary
+  font.weight: 500
   renderType: Text.HighRenderTypeQuality
   antialiasing: true
   smooth: true

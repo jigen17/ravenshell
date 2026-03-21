@@ -7,16 +7,22 @@ import qs.config
 import qs.widgets
 import qs.assets
 
-Rectangle {
+Item {
     id: root
-    color: ColorService.colorPalette.backgroundSecondary_300
+
+    Rectangle {
+        anchors.fill: parent
+        color: ColorService.colorPalette.backgroundSecondary
+        radius: 18
+    }
+
     RowLayout {
-        id: userRow
+      spacing: Ui.tokens.spacing.sm
         anchors {
-          fill: parent
-          margins: Ui.tokens.spacing.md 
-          }
-          spacing: Ui.tokens.spacing.sm
+            fill: parent
+            margins: 20
+        }
+
         ClippingRectangle {
             implicitWidth: 40
             implicitHeight: 40
@@ -24,7 +30,7 @@ Rectangle {
             color: "transparent"
             border {
                 color: ColorService.colorPalette.accentPrimary
-                width: 2
+                width: 1
             }
             Image {
                 anchors.fill: parent
@@ -35,22 +41,20 @@ Rectangle {
             }
         }
 
-        RavenText {
-          text: "Hey,Mikaelio!"
-          font.bold: true
+        Column {
+          Layout.alignment: Qt.AlignVCenter
+          Layout.fillWidth: true
+            RavenText {
+                text: "Hey,Mikaelio!"
+                font.bold: true
+            }
         }
 
-        Item {
-            Layout.fillWidth: true
+        ButtonIcon {
+            iconName: Icons.settings.gearsix
         }
-        Row {
-          spacing: 10
-            ButtonIcon {
-                iconName: Icons.settings.gearsix
-            }
-            ButtonIcon {
-                iconName: Icons.power.shutdown
-            }
+        ButtonIcon {
+            iconName: Icons.power.shutdown
         }
     }
 }

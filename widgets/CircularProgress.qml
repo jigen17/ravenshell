@@ -10,7 +10,7 @@ Item {
     implicitHeight: implicitWidth
     
     property real progress: 0.5
-    property color accentColor: ColorService.colorPalette.accentPrimary
+    property color accentColor: ColorService.colorPalette.accentonPrimary
     property color backgroundColor: ColorService.colorPalette.backgroundSecondary_300
     property real gapAngle: 60
     property string iconName: ""
@@ -26,7 +26,7 @@ Item {
         onPaint: {
             var ctx = getContext("2d");
             ctx.reset();
-            var cx = width / 2, cy = height / 2, r = 12, lw = 4;
+            var cx = width / 2, cy = height / 2, r = 12, lw = 5;
             var start = (Math.PI / 2) + (root.gapAngle * Math.PI / 180);
             var total = (360 - 2 * root.gapAngle) * Math.PI / 180;
             

@@ -9,8 +9,8 @@ import qs.widgets
 Rectangle {
     id: root
     color: NetworkService.wifiEnabled 
-           ? ColorService.colorPalette.accentonPrimary
-           : ColorService.colorPalette.backgroundSecondary_300
+           ? ColorService.colorPalette.backgroundSecondary_300
+           : ColorService.colorPalette.backgroundSecondary
     
     Behavior on color {
         ColorAnimation {
@@ -18,13 +18,12 @@ Rectangle {
             easing.type: Easing.OutQuad
         }
     }
-    topLeftRadius: 18
-    topRightRadius: 10
-    bottomLeftRadius: 18
-    bottomRightRadius: 10
+    radius: 18
     RowLayout {
-        anchors.fill: parent
-        anchors.margins: Ui.tokens.spacing.md
+        anchors {
+          fill: parent
+          leftMargin: 10
+        }
         spacing: Ui.tokens.spacing.sm
         
         ButtonIcon {
@@ -45,7 +44,7 @@ Rectangle {
             spacing: 0 
             RavenText {
                 text: NetworkService.activeNetwork?.name ?? "Disabled"
-                Layout.maximumWidth: 100
+                Layout.maximumWidth: 150
                 elide: Text.ElideRight
                 fontSize: Ui.tokens.fontSize.sm
             }
@@ -57,10 +56,11 @@ Rectangle {
             }
         }
         
-        Item { Layout.fillWidth: true }
-        
         ButtonIcon {
-            iconName: Icons.carets.right
+          iconName: Icons.carets.right
+          iconSize: 10
+          buttonPadding: 8
+          backgroundColor: ColorService.colorPalette.backgroundSecondary_100
         }
     }
 }
