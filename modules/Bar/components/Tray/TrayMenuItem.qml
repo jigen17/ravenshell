@@ -97,8 +97,8 @@ Item {
                     }
                     else {
                       root.newmenu();
-                      root.trayItem.triggered();
                     }
+                   root.trayItem.triggered();
                 }
             }
         }

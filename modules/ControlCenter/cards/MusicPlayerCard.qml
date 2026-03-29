@@ -18,8 +18,8 @@ Item {
         radius: 12
         color: ColorService.colorPalette.accentPrimary_300
         border {
-            width: 2
-            color: ColorService.colorPalette.backgroundSecondary
+            width: 1
+            color: Qt.rgba(ColorService.colorPalette.textPrimary.r,ColorService.colorPalette.textPrimary.g,ColorService.colorPalette.textPrimary.b,0.2);
         }
 
         Image {
@@ -52,8 +52,8 @@ Item {
 
         // --- Album Art ---
         ClippingRectangle {
-            Layout.preferredHeight: 120
-            Layout.preferredWidth: 120
+            Layout.preferredHeight: 150
+            Layout.preferredWidth: 150
             Layout.alignment: Qt.AlignHCenter
             radius: 12
 

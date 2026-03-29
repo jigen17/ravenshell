@@ -85,7 +85,8 @@ Item {
             focusable: true
             visible: true
             color: "transparent"
-            exclusiveZone: -1
+            WlrLayershell.exclusiveZone: 1
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
             // Fixed size - no calculations
             implicitWidth: root.panelWidth + root.margins * 2
             implicitHeight: root.panelHeight + root.margins * 2

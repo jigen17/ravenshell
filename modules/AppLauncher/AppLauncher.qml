@@ -31,48 +31,37 @@ StyledPanel {
         id: rootContent
 
         // Categories
-        property var categoryModel: [
-            {
-                "name": "",
-                "icon": Icons.layouts.grid_squares
-            },
-            {
-                "name": "Development",
-                "icon": Icons.development.code
-            },
-            {
-                "name": "Game",
-                "icon": Icons.devices.game_controller
-            },
-            {
-                "name": "Graphics",
-                "icon": Icons.media.palette
-            },
-            {
-                "name": "Network",
-                "icon": Icons.internet.globe
-            },
-            {
-                "name": "AudioVideo",
-                "icon": Icons.media.film_strip
-            },
-            {
-                "name": "Office",
-                "icon": Icons.office.notepad
-            },
-            {
-                "name": "Settings",
-                "icon": Icons.settings.gear
-            },
-            {
-                "name": "Utility",
-                "icon": Icons.utilities.toolbox
-            },
-            {
-                "name": "System",
-                "icon": Icons.help.info
-            }
-        ]
+        property var categoryModel: [{
+            "name": "",
+            "icon": Icons.layouts.grid_squares
+        }, {
+            "name": "Development",
+            "icon": Icons.development.code
+        }, {
+            "name": "Game",
+            "icon": Icons.devices.gamepad
+        }, {
+            "name": "Graphics",
+            "icon": Icons.media.palette
+        }, {
+            "name": "Network",
+            "icon": Icons.internet.globe
+        }, {
+            "name": "AudioVideo",
+            "icon": Icons.media.film_strip
+        }, {
+            "name": "Office",
+            "icon": Icons.office.notepad
+        }, {
+            "name": "Settings",
+            "icon": Icons.settings.gear
+        }, {
+            "name": "Utility",
+            "icon": Icons.utilities.toolbox
+        }, {
+            "name": "System",
+            "icon": Icons.help.info
+        }]
         property int currentCategoryIndex: 0
 
         function nextCategory() {
@@ -143,8 +132,11 @@ StyledPanel {
                                     AppService.setCategory(modelData.name);
                             }
                         }
+
                     }
+
                 }
+
             }
 
             // =========================================================
@@ -158,7 +150,24 @@ StyledPanel {
                         const delegate = appList.itemAtIndex(appList.currentIndex);
                         if (delegate && delegate.runApp)
                             delegate.runApp();
+
                     }
+                }
+
+                function moveIndex(delta) {
+                    if (appList.count === 0)
+                        return ;
+
+                    appList.currentIndex = (appList.currentIndex + delta + appList.count) % appList.count;
+                    appList.positionViewAtIndex(appList.currentIndex, ListView.Contain);
+                }
+
+                function setIndex(index) {
+                    if (appList.count === 0)
+                        return ;
+
+                    appList.currentIndex = index;
+                    appList.positionViewAtIndex(appList.currentIndex, ListView.Contain);
                 }
 
                 Layout.fillWidth: true
@@ -167,19 +176,6 @@ StyledPanel {
                 Layout.bottomMargin: Ui.tokens.spacing.xs
                 spacing: Ui.tokens.spacing.sm
 
-                function moveIndex(delta) {
-                    if (appList.count === 0)
-                        return;
-                    appList.currentIndex = (appList.currentIndex + delta + appList.count) % appList.count;
-                    appList.positionViewAtIndex(appList.currentIndex, ListView.Contain);
-                }
-
-                function setIndex(index) {
-                    if (appList.count === 0)
-                        return;
-                    appList.currentIndex = index;
-                    appList.positionViewAtIndex(appList.currentIndex, ListView.Contain);
-                }
                 // =====================================================
                 // Search Field
                 // =====================================================
@@ -198,21 +194,21 @@ StyledPanel {
                         AppService.searchApplications(text);
                         if (appList.count > 0)
                             appList.currentIndex = 0;
-                    }
 
-                    Keys.onPressed: event => {
+                    }
+                    Keys.onPressed: (event) => {
                         if (event.key === Qt.Key_Escape) {
                             root.closeWindow();
                             event.accepted = true;
-                            return;
+                            return ;
                         }
                         if (event.key === Qt.Key_Tab) {
                             rootContent.nextCategory();
                             event.accepted = true;
-                            return;
+                            return ;
                         }
                         if (appList.count === 0)
-                            return;
+                            return ;
 
                         switch (event.key) {
                         case Qt.Key_Return:
@@ -248,12 +244,14 @@ StyledPanel {
                             break;
                         }
                     }
+
                     background: Rectangle {
                         radius: 10
                         color: ColorService.colorPalette.backgroundSecondary_700
                         border.width: 2
                         border.color: searchField.activeFocus ? ColorService.colorPalette.accentPrimary : Qt.rgba(ColorService.colorPalette.accentPrimary.r, ColorService.colorPalette.accentPrimary.g, ColorService.colorPalette.accentPrimary.b, 0.3)
                     }
+
                 }
 
                 // =====================================================
@@ -283,9 +281,9 @@ StyledPanel {
                                 modelData.execute();
                             else
                                 Quickshell.execDetached({
-                                    "command": ["kitty", "sh", "-c", modelData.execString],
-                                    "workingDirectory": modelData.workingDirectory
-                                });
+                                "command": ["kitty", "sh", "-c", modelData.execString],
+                                "workingDirectory": modelData.workingDirectory
+                            });
                             root.closeWindow();
                         }
 
@@ -328,11 +326,13 @@ StyledPanel {
                                     opacity: 0.65
                                     elide: Text.ElideRight
                                 }
+
                             }
 
                             Item {
                                 Layout.fillWidth: true
                             }
+
                         }
 
                         MouseArea {
@@ -341,9 +341,15 @@ StyledPanel {
                             onEntered: appList.currentIndex = appDelegate.index
                             onClicked: appDelegate.runApp()
                         }
+
                     }
+
                 }
+
             }
+
         }
+
     }
+
 }

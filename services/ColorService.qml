@@ -7,7 +7,7 @@ pragma Singleton
 Singleton {
     id: root
 
-    property bool isLightTheme: false //Settings.config.themes.lightTheme
+    property bool isLightTheme: Settings.config.themes.lightTheme
     property var colorPalette: wallustFile.adapter.wallust.dark
 
     onIsLightThemeChanged: {

@@ -1,79 +1,41 @@
 import QtQuick
-import QtQuick.Layouts
-import Quickshell
-import Quickshell.Widgets
-import qs.assets
-import qs.config
+import QtQuick.Controls
 import qs.services
-import qs.widgets
 
-Item {
+Slider {
     id: root
 
-    // Core properties
-    property real value: 0.5
-    property bool muted: false
-    property string iconName: ""
-    property color accentColor: ColorService.colorPalette.accentPrimary
-    property int radius: 12
+    property color fillColor: ColorService.colorPalette.accentSecondary
+    property int radius: 8
 
-    ClippingRectangle {
-        anchors.fill: parent
+    from: 0
+    to: 1
+    live: true
+    wheelEnabled: true
+
+    background: Rectangle {
+        anchors.verticalCenter: parent.verticalCenter
+        width: root.availableWidth
+        height: root.height * 0.5
         radius: root.radius
-        color: ColorService.colorPalette.accentPrimary_100
-        clip: true
-        smooth: true
-        antialiasing: true
+        color: Qt.rgba(ColorService.colorPalette.textPrimary.r, ColorService.colorPalette.textPrimary.g, ColorService.colorPalette.textPrimary.b, 0.1)
 
         Rectangle {
-            id: fill
-
-            implicitWidth: parent.width
-            implicitHeight: parent.height * root.value
-            anchors.bottom: parent.bottom
-            smooth: true
-            antialiasing: true
-            color: root.muted ? "#444444" : root.accentColor
-
-            Behavior on height {
-                NumberAnimation {
-                    duration: 250
-                    easing.type: Easing.OutCubic
-                }
-
-            }
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: 200
-                }
-
-            }
-
+            width: root.visualPosition * parent.width
+            height: parent.height
+            radius: parent.radius
+            color: root.fillColor
         }
 
-        RavenIcon {
-            id: toggleButton
-
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 15
-            anchors.horizontalCenter: parent.horizontalCenter
-            iconName: root.iconName
-            iconSize: 22
-            font.weight: 600            
-        }
     }
 
-    // Interaction Area
-    MouseArea {
-        anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
-        onPositionChanged: (mouse) => {
-            if (pressed) {
-                let pos = 1 - (mouse.y / height);
-                root.value = Math.max(0, Math.min(1, pos));
-            }
-        }
+    handle: Rectangle {
+        x: root.leftPadding + root.visualPosition * root.availableWidth - width / 2
+        y: root.topPadding + root.availableHeight / 2 - height / 2
+        width: root.height
+        height: width
+        radius: width / 2
+        color: "#ffffff"
     }
 
 }

@@ -26,7 +26,10 @@ Variants {
                 left: true
             }
             margins {
-                bottom: -2
+                bottom: -5
+                right: 10
+                left: 10
+                top: 5
             }
             exclusionMode: ExclusionMode.Auto
             WlrLayershell.layer: WlrLayer.Top
@@ -54,129 +57,34 @@ Variants {
                 property string monitorName: screen?.name ?? ""
 
                 // Static background shape - separate layer, never redraws
-                Item {
-                    id: backgroundLayer
-                    anchors.fill: parent
-                    MultiEffect {
-                        source: backgroundShape
-                        anchors.fill: parent
-                        shadowEnabled: true
-                        shadowColor: Qt.rgba(ColorService.colorPalette.backgroundPrimary.r, ColorService.colorPalette.backgroundPrimary.g, ColorService.colorPalette.backgroundPrimary.b, 0.8)
-                        shadowBlur: 0.2
-                        shadowVerticalOffset: 2
-                        shadowHorizontalOffset: 0
-                        blurEnabled: true
-                        blur: 1.0
-                        blurMax: 32
-                    }
 
-                    Shape {
-                        id: backgroundShape
-                        anchors.fill: parent
-                        preferredRendererType: Shape.CurveRenderer
-                        ShapePath {
-                            strokeWidth: 0
-                            strokeColor: "transparent"
-                            fillColor: Qt.rgba(ColorService.colorPalette.backgroundPrimary.r, ColorService.colorPalette.backgroundPrimary.g, ColorService.colorPalette.backgroundPrimary.b, 0.7)
+Item {
+    id: blurContainer
+    anchors.fill: parent
+    clip: true  // ← hard clip: no blur bleeds outside this item
 
-                            startX: 0
-                            startY: 0
+    Rectangle {
+        id: backgroundShape
+        anchors.fill: parent
+        radius: 12
+        color: Qt.rgba(
+            ColorService.colorPalette.backgroundPrimary.r,
+            ColorService.colorPalette.backgroundPrimary.g,
+            ColorService.colorPalette.backgroundPrimary.b,
+            0.3
+        )
+    }
 
-                            PathLine {
-                                relativeX: root.width
-                                relativeY: 0
-                            }
-
-                            PathLine {
-                                relativeX: 0
-                                relativeY: root.height
-                            }
-
-                            PathLine {
-                                relativeX: -(root.estimatedRightWidth - 10)
-                                relativeY: 0
-                            }
-
-                            PathQuad {
-                                relativeX: -root.notchWidth - 10
-                                relativeY: -root.height / 2
-                                relativeControlX: -root.notchWidth / 2
-                                relativeControlY: 0
-                            }
-
-                            PathQuad {
-                                relativeX: -root.notchWidth - 20
-                                relativeY: -(root.height / 2 - 10)
-                                relativeControlX: -root.notchWidth / 2
-                                relativeControlY: -(root.height / 4)
-                            }
-
-                            PathLine {
-                                relativeX: -(root.width / 2 - root.estimatedWorkspaceWidth / 2 - root.estimatedRightWidth - root.notchWidth * 3 - 40)
-                                relativeY: 0
-                            }
-
-                            PathQuad {
-                                relativeX: -root.notchWidth - 10
-                                relativeY: root.height / 2
-                                relativeControlX: -root.notchWidth / 2
-                                relativeControlY: 0
-                            }
-                            PathQuad {
-                                relativeX: -root.notchWidth
-                                relativeY: root.height / 2 - 10
-                                relativeControlX: -root.notchWidth / 2
-                                relativeControlY: root.height / 4
-                            }
-
-                            PathLine {
-                                relativeX: -(root.estimatedWorkspaceWidth - 20)
-                                relativeY: 0
-                            }
-
-                            PathQuad {
-                                relativeX: -root.notchWidth - 10
-                                relativeY: -root.height / 2
-                                relativeControlX: -root.notchWidth / 2
-                                relativeControlY: 0
-                            }
-
-                            PathQuad {
-                                relativeX: -root.notchWidth - 20
-                                relativeY: -(root.height / 2 - 10)
-                                relativeControlX: -root.notchWidth / 2
-                                relativeControlY: -(root.height / 4)
-                            }
-
-                            PathLine {
-                                relativeX: -(root.width / 2 - root.estimatedLeftWidth - root.estimatedWorkspaceWidth / 2 - root.notchWidth * 2 - 80)
-                                relativeY: 0
-                            }
-
-                            PathQuad {
-                                relativeX: -root.notchWidth - 10
-                                relativeY: root.height / 2
-                                relativeControlX: -root.notchWidth / 1.5
-                                relativeControlY: 2
-                            }
-                            PathQuad {
-                                relativeX: -root.notchWidth
-                                relativeY: root.height / 2 - 10
-                                relativeControlX: -root.notchWidth / 2
-                                relativeControlY: root.height / 4
-                            }
-                            PathLine {
-                                relativeX: -(root.estimatedLeftWidth + 20)
-                                relativeY: 0
-                            }
-
-                            PathLine {
-                                relativeX: 0
-                                relativeY: -root.height
-                            }
-                        }
-                    }
-                }
+    MultiEffect {
+        source: backgroundShape
+        anchors.fill: backgroundShape
+        shadowEnabled: true
+        blurEnabled: true
+        blur: 1       // ← much more reasonable value
+        blurMax: 16      // ← tighter radius
+        autoPaddingEnabled: false  // ← disable auto-expansion
+    }
+}
 
                 RowLayout {
                     id: leftRow

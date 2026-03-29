@@ -12,7 +12,7 @@ Singleton {
     property list<NotifWrapper> history: []
     property list<NotifWrapper> popupQueue: []
     property list<NotifWrapper> visiblePopups: []
-
+    property bool dndEnabled: false
     function receiveNotification(notif) {
         const obj = notifComponent.createObject(root, {
             "notif": notif,
@@ -64,9 +64,10 @@ Singleton {
         return "";
     }
 
-function processQueue() {
+    function processQueue() {
         const slots = maxVisiblePopups - visiblePopups.length;
-        if (slots <= 0 || popupQueue.length === 0) return;
+        if (slots <= 0 || popupQueue.length === 0)
+            return;
 
         const toShow = popupQueue.slice(0, slots);   // grab what we can show
         const remaining = popupQueue.slice(slots);    // everything left behind
@@ -86,16 +87,29 @@ function processQueue() {
         processQueue();
     }
 
-    // User dismissed → remove from visible AND history, then destroy
+    // User dismissed → remov  e from visible AND history, then destroy
     function dismissNotification(obj) {
         visiblePopups = visiblePopups.filter(popup => popup !== obj);
         history = history.filter(item => item !== obj);
         if (obj.timer.running)
             obj.timer.stop();
+        obj.notif.expire();  // ← tells the server it's done
         obj.destroy();
         processQueue();
     }
 
+    function clearAllNotifs() {
+        for (let item of history) {
+            visiblePopups = visiblePopups.filter(p => p !== item);
+            if (item.timer.running)
+                item.timer.stop();
+            item.notif.expire();  // ← same here
+            item.destroy();
+        }
+        history = [];
+        popupQueue = [];
+        processQueue();
+    }
     // --- Notification Object Component ---
     Component {
         id: notifComponent

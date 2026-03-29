@@ -3,24 +3,26 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
-import qs.services
-import qs.widgets
 import qs.assets
 import qs.config
+import qs.services
+import qs.widgets
 
 Item {
     //radius: 18
     //color: ColorService.colorPalette.backgroundPrimary
     clip: true
+
     ListView {
         id: listItem
+
         anchors.fill: parent
         anchors.verticalCenter: parent.verticalCenter
         orientation: ListView.Horizontal
         spacing: 8
-        model: WeatherService.hourModel
         clip: true
-
+        interactive: true
+        model: WeatherService.hourModel
         Component.onCompleted: {
             positionViewAtIndex(0, ListView.Beginning);
         }
@@ -64,6 +66,7 @@ Item {
                             text: model.temperature + "°"
                             fontSize: 16
                         }
+
                     }
 
                     ColumnLayout {
@@ -73,45 +76,60 @@ Item {
                         RowLayout {
                             spacing: 4
                             opacity: 0.8
+
                             RavenIcon {
                                 iconName: Icons.weather.drop
                                 iconSize: 12
                                 Layout.alignment: Qt.AlignVCenter
                             }
+
                             RavenText {
                                 text: model.humidity + "%"
                                 fontSize: 12
                             }
+
                         }
 
                         RowLayout {
                             spacing: 4
                             opacity: 0.8
+
                             RavenIcon {
                                 iconName: Icons.weather.wind
                                 iconSize: 12
                             }
+
                             RavenText {
                                 text: model.windSpeed + " km/h"
                                 fontSize: 12
                             }
+
                         }
 
                         RowLayout {
                             spacing: 4
                             opacity: 0.8
+
                             RavenIcon {
                                 iconName: Icons.weather.umbrella
                                 iconSize: 12
                             }
+
                             RavenText {
                                 text: model.precipitation + "%"
                                 fontSize: 12
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
+
     }
+
 }

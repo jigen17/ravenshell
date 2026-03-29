@@ -17,7 +17,7 @@ Item {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Auto
             color: "transparent"
-            implicitWidth: 300
+            implicitWidth: 320
             implicitHeight: column.implicitHeight + 10
 
             anchors {

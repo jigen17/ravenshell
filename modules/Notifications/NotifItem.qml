@@ -17,7 +17,6 @@ Item {
     signal dismissed
 
     // Size driven by content, never below 140
-    implicitWidth: 360
 
     // ── Frosted glass card ──────────────────────────────────────────────
     Rectangle {
@@ -70,7 +69,7 @@ Item {
             IconImage {
                 id: appIcon
                 anchors.centerIn: parent
-                implicitSize: 30
+                implicitSize: 32
                 visible: root.notifItem.appIcon !== ""
                 source: Quickshell.iconPath(root.notifItem.appIcon)
                 smooth: true
@@ -93,7 +92,7 @@ Item {
             spacing: 0
 
             Component.onCompleted: {
-                Qt.callLater(() => root.implicitHeight = Math.max(140, contentColumn.implicitHeight + 28))
+              Qt.callLater(() => root.implicitHeight = Math.max(100, contentColumn.implicitHeight + 28))
             }
 
             // App name + dismiss

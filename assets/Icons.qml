@@ -164,8 +164,14 @@ QtObject {
         readonly property string link_break: "\u{e2e4}"
         readonly property string dismiss: "\u{e4f6}"
         readonly property string dismiss_circle: "\u{e4f8}"
+        readonly property string broom: "\u{ec54}"
         readonly property string hourglass: "\u{e2b2}"
         readonly property string agreement: "\u{e582}"
+        readonly property string home: "\u{e2c2}"
+        readonly property string antenna: "\u{ebaa}"
+        readonly property string contrast: "\u{e18c}"
+        readonly property string calendar: "\u{e108}"
+        readonly property string weather: "\u{e540}"
         readonly property QtObject
         screenshot: QtObject {
             readonly property string region: ""
@@ -287,19 +293,8 @@ QtObject {
         readonly property string balanced: "\u{e750}"
         readonly property string performance: "\u{e3fe}"
     }
+    // ============================================
 
-    // ============================================
-    // KEYBOARD
-    // ============================================
-    readonly property QtObject
-    keyboard: QtObject {
-        readonly property string keyboard: ""
-        readonly property string backspace: ""
-        readonly property string enter: ""
-        readonly property string shift: ""
-    }
-
-    // ============================================
     // DEVICES
     // ============================================
     readonly property QtObject
@@ -308,7 +303,7 @@ QtObject {
         readonly property string mouse: ""
         readonly property string phone: "\u{e1e0}"
         readonly property string watch: ""
-        readonly property string game_controller: "\u{e26e}"
+        readonly property string gamepad: "\u{e26e}"
         readonly property string printer: ""
         readonly property string camera: "\u{e10e}"
         readonly property string video_camera: "\u{e4da}"

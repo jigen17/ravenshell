@@ -30,7 +30,7 @@ Item {
     Rectangle {
         id: background
         anchors.fill: parent
-        color: ColorService.colorPalette.backgroundSecondary
+        color: ColorService.colorPalette.accentPrimary
         radius: 20
     }
     
@@ -71,7 +71,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             
             radius: implicitWidth / 2        
-            color: ColorService.colorPalette.accentonSecondary
+            color: ColorService.colorPalette.accentPrimary_100
             
             transform: Translate {
                 x: activeHighlight.activeIndex * root.workspaceButtonSize
@@ -192,7 +192,7 @@ Item {
                             implicitHeight: implicitWidth
                             radius: implicitWidth / 2
                             
-                            color: ColorService.colorPalette.accentSecondary
+                            color: ColorService.colorPalette.accentonPrimary
                             
                             Behavior on implicitWidth {
                                 NumberAnimation { 

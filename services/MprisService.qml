@@ -8,7 +8,7 @@ Singleton {
   id: root
   
 property var players: Mpris.players.values
-property var blackListedPlayers: ["Mozilla zen"]
+property var blackListedPlayers: ["Mozilla zen", "Youtube"]
 
 property var allowedPlayers: players.filter(player =>
     !blackListedPlayers.includes(player.identity)

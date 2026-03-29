@@ -11,7 +11,7 @@
 //@ pragma Env QT_FFMPEG_ENCODING_HW_DEVICE_TYPES=vaapi
 //@ pragma Env QT_QPA_NO_TABLET_EVENTS=1
 //@ pragma Env QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-//@pragma Env QT_QPA_PLATFORMTHEME=qtengine
+//@ pragma IconTheme Reversal
 import QtQuick
 import Quickshell
 import qs.modules.Anime
